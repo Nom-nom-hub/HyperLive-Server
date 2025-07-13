@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings Test - Advanced Live Server</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #f5f5f5;
+        color: #333;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .test-section h2 {
+        margin-top: 0;
+        color: #34495e;
+      }
+      .status {
+        padding: 10px;
+        border-radius: 4px;
+        margin: 10px 0;
+      }
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .status.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .status.info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      .test-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+      .test-item {
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-align: center;
+      }
+      .test-item h3 {
+        margin-top: 0;
+        color: #495057;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔧 Advanced Live Server Settings Test</h1>
+
+      <div class="status info">
+        <strong>Test Instructions:</strong>
+        <ol>
+          <li>Open the Advanced Live Server settings panel</li>
+          <li>
+            Change various settings (port, HTTPS, auto-open browser, etc.)
+          </li>
+          <li>Save the settings</li>
+          <li>Restart the server to see if the settings are applied</li>
+          <li>Test the "Reset to Defaults" button</li>
+        </ol>
+      </div>
+
+      <div class="test-section">
+        <h2>✅ Settings to Test</h2>
+        <div class="test-grid">
+          <div class="test-item">
+            <h3>Port</h3>
+            <p>Change from 5500 to another port (e.g., 3000)</p>
+          </div>
+          <div class="test-item">
+            <h3>HTTPS</h3>
+            <p>Enable HTTPS with self-signed certificates</p>
+          </div>
+          <div class="test-item">
+            <h3>Auto-Open Browser</h3>
+            <p>Enable/disable automatic browser opening</p>
+          </div>
+          <div class="test-item">
+            <h3>SPA Mode</h3>
+            <p>Enable SPA mode with history API fallback</p>
+          </div>
+          <div class="test-item">
+            <h3>Show Overlay</h3>
+            <p>Enable/disable developer tools overlay</p>
+          </div>
+          <div class="test-item">
+            <h3>Watch Patterns</h3>
+            <p>Add/remove file watching patterns</p>
+          </div>
+          <div class="test-item">
+            <h3>Proxy Rules</h3>
+            <p>Add API proxy rules</p>
+          </div>
+          <div class="test-item">
+            <h3>AI Settings</h3>
+            <p>Configure AI mode and provider</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2>🧪 Test Results</h2>
+        <div id="testResults">
+          <div class="status info">
+            Run the tests above and check the results here...
+          </div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2>🔍 Debug Information</h2>
+        <div id="debugInfo">
+          <p><strong>Current URL:</strong> <span id="currentUrl"></span></p>
+          <p><strong>Protocol:</strong> <span id="protocol"></span></p>
+          <p><strong>Port:</strong> <span id="port"></span></p>
+          <p><strong>User Agent:</strong> <span id="userAgent"></span></p>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2>📋 Test Checklist</h2>
+        <div id="checklist">
+          <label
+            ><input type="checkbox" id="test1" /> Settings panel opens
+            correctly</label
+          ><br />
+          <label
+            ><input type="checkbox" id="test2" /> Settings are loaded from
+            VSCode configuration</label
+          ><br />
+          <label
+            ><input type="checkbox" id="test3" /> Save Settings button
+            works</label
+          ><br />
+          <label
+            ><input type="checkbox" id="test4" /> Reset to Defaults button
+            works</label
+          ><br />
+          <label
+            ><input type="checkbox" id="test5" /> Port setting is applied when
+            server restarts</label
+          ><br />
+          <label
+            ><input type="checkbox" id="test6" /> HTTPS setting is applied when
+            server restarts</label
+          ><br />
+          <label
+            ><input type="checkbox" id="test7" /> Auto-open browser setting is
+            applied</label
+          ><br />
+          <label
+            ><input type="checkbox" id="test8" /> SPA mode setting is
+            applied</label
+          ><br />
+          <label
+            ><input type="checkbox" id="test9" /> Show overlay setting is
+            applied</label
+          ><br />
+          <label
+            ><input type="checkbox" id="test10" /> Export/Import settings
+            work</label
+          ><br />
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Display debug information
+      document.getElementById('currentUrl').textContent = window.location.href;
+      document.getElementById('protocol').textContent =
+        window.location.protocol;
+      document.getElementById('port').textContent = window.location.port;
+      document.getElementById('userAgent').textContent = navigator.userAgent;
+
+      // Add some interactive functionality
+      document.addEventListener('DOMContentLoaded', function () {
+        console.log('Advanced Live Server Settings Test Page Loaded');
+        console.log('URL:', window.location.href);
+        console.log('Protocol:', window.location.protocol);
+        console.log('Port:', window.location.port);
+      });
+
+      // Test if live reload is working
+      let reloadCount = 0;
+      if (sessionStorage.getItem('reloadCount')) {
+        reloadCount = parseInt(sessionStorage.getItem('reloadCount')) + 1;
+      }
+      sessionStorage.setItem('reloadCount', reloadCount.toString());
+
+      if (reloadCount > 0) {
+        const results = document.getElementById('testResults');
+        results.innerHTML = `
+                <div class="status success">
+                    <strong>✅ Live Reload Test:</strong> Page has been reloaded ${reloadCount} time(s) automatically!
+                </div>
+            `;
+      }
+    </script>
+  </body>
+</html>

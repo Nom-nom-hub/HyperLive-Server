@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        .status {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Advanced Live Server</h1>
+        <p>If you can see this page, the server is working!</p>
+        
+        <div class="status">
+            <h3>Server Status</h3>
+            <p>✅ Server is running</p>
+            <p>✅ File serving is working</p>
+            <p>✅ HTML injection is active</p>
+        </div>
+        
+        <p>Try editing this file and watch it reload automatically!</p>
+        
+        <div id="timestamp"></div>
+    </div>
+
+    <script>
+        // Update timestamp every second
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('timestamp').textContent = 
+                `Last updated: ${now.toLocaleTimeString()}`;
+        }
+        
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+        
+        console.log('🚀 Advanced Live Server Test Page Loaded');
+    </script>
+</body>
+</html> 

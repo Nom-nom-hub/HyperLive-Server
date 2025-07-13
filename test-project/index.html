@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' ws: wss:;"
+    />
+    <title>Advanced Live Server Test</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🚀 Super Advanced Live Server</h1>
+        <p>A full-featured live server replacement for VSCode</p>
+        
+        <!-- Navigation Menu -->
+        <nav class="nav-menu">
+            <a href="/index.html" class="nav-link">🏠 Home</a>
+            <a href="/simple-test.html" class="nav-link">🧪 Simple Test</a>
+            <a href="/settings-test.html" class="nav-link">⚙️ Settings Test</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="features">
+          <h2>✨ Features</h2>
+          <div class="feature-grid">
+            <div class="feature-card">
+              <h3>🔄 Auto Reload</h3>
+              <p>Automatically reloads the browser when files change</p>
+            </div>
+            <div class="feature-card">
+              <h3>📱 Mobile Sync</h3>
+              <p>QR code for mobile device access</p>
+            </div>
+            <div class="feature-card">
+              <h3>🔒 HTTPS Support</h3>
+              <p>Built-in HTTPS with self-signed certificates</p>
+            </div>
+            <div class="feature-card">
+              <h3>🔄 SPA Support</h3>
+              <p>History API fallback for single-page applications</p>
+            </div>
+            <div class="feature-card">
+              <h3>🌐 Proxy Support</h3>
+              <p>API proxying for development</p>
+            </div>
+            <div class="feature-card">
+              <h3>🛠️ Developer Tools</h3>
+              <p>In-browser overlay with error reporting</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="demo">
+          <h2>🧪 Live Demo</h2>
+          <div class="demo-content">
+            <p>Try editing this file and watch it reload automatically!</p>
+            <button id="testButton" class="btn">Click Me!</button>
+            <div id="output" class="output"></div>
+          </div>
+        </section>
+
+        <section class="status">
+          <h2>📊 Connection Status (live)</h2>
+          <div id="status" class="status-indicator">
+            <span class="status-dot"></span>
+            <span class="status-text">Connecting...</span>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <p>Built with ❤️ for VSCode developers</p>
+      </footer>
+    </div>
+
+    <script src="app.js?v=3"></script>
+  </body>
+</html>

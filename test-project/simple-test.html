@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple WebSocket Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f0f0f0;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        font-weight: bold;
+      }
+      .connected {
+        background: #d4edda;
+        color: #155724;
+      }
+      .disconnected {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      .connecting {
+        background: #fff3cd;
+        color: #856404;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔧 WebSocket Connection Test</h1>
+
+    <div id="status" class="status connecting">Connecting to WebSocket...</div>
+
+    <div id="logs"></div>
+
+    <button onclick="testConnection()">Test Connection</button>
+    <button onclick="clearLogs()">Clear Logs</button>
+
+    <script>
+      function log(message) {
+        const logs = document.getElementById('logs');
+        const time = new Date().toLocaleTimeString();
+        logs.innerHTML += `<div>[${time}] ${message}</div>`;
+        console.log(message);
+      }
+
+      function clearLogs() {
+        document.getElementById('logs').innerHTML = '';
+      }
+
+      function updateStatus(status, className) {
+        const statusEl = document.getElementById('status');
+        statusEl.textContent = status;
+        statusEl.className = `status ${className}`;
+      }
+
+      function testConnection() {
+        log('🔧 Testing WebSocket connection...');
+
+        try {
+          const ws = new WebSocket('ws://localhost:5500');
+
+          ws.onopen = function () {
+            log('✅ WebSocket connected successfully!');
+            updateStatus('Connected to Live Server', 'connected');
+          };
+
+          ws.onmessage = function (event) {
+            log(`📨 Received message: ${event.data}`);
+          };
+
+          ws.onclose = function () {
+            log('🔌 WebSocket connection closed');
+            updateStatus('Disconnected', 'disconnected');
+          };
+
+          ws.onerror = function (error) {
+            log(`❌ WebSocket error: ${error}`);
+            updateStatus('Connection Error', 'disconnected');
+          };
+        } catch (error) {
+          log(`❌ Failed to create WebSocket: ${error}`);
+          updateStatus('Failed to connect', 'disconnected');
+        }
+      }
+
+      // Test connection on page load
+      window.addEventListener('load', function () {
+        log('🚀 Page loaded, testing WebSocket...');
+        testConnection();
+      });
+    </script>
+  </body>
+</html>

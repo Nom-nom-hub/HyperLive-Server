@@ -1,0 +1,570 @@
+{
+  "name": "advanced-live-server",
+  "displayName": "Advanced Live Server",
+  "description": "A full-featured live server replacement with AI-powered development tools, cloud preview, and mobile sync. 🚀 Pro: $24.99 | 🏢 Enterprise: $129.99 - Get licenses at https://teckmaster.gumroad.com/l/advanced-live-server-pro",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "advancedLiveServer.start",
+        "title": "Advanced Live Server: Start Server",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.stop",
+        "title": "Advanced Live Server: Stop Server",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.restart",
+        "title": "Advanced Live Server: Restart Server",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.openInBrowser",
+        "title": "Advanced Live Server: Open in Browser",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.openCurrentFile",
+        "title": "Advanced Live Server: Open Current File",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.showStatus",
+        "title": "Advanced Live Server: Show Status",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.startCloudPreview",
+        "title": "Advanced Live Server: Start Cloud Preview",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.stopCloudPreview",
+        "title": "Advanced Live Server: Stop Cloud Preview",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.openSettings",
+        "title": "Advanced Live Server: Open Settings",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.resetSettings",
+        "title": "Advanced Live Server: Reset Settings",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.openVSCodeSettings",
+        "title": "Advanced Live Server: Open VSCode Settings",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.quickSettings",
+        "title": "Advanced Live Server: Quick Settings",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.showCurrentSettings",
+        "title": "Advanced Live Server: Show Current Settings",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.analyzeError",
+        "title": "Advanced Live Server: Analyze Error",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.analyzeAccessibility",
+        "title": "Advanced Live Server: Analyze Accessibility",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.suggestImprovements",
+        "title": "Advanced Live Server: Suggest Code Improvements",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.analyzePerformance",
+        "title": "Advanced Live Server: Analyze Performance",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.analyzeSEO",
+        "title": "Advanced Live Server: Analyze SEO",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.securityScan",
+        "title": "Advanced Live Server: Security Scan",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.triggerBuild",
+        "title": "Advanced Live Server: Trigger Build",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.runTests",
+        "title": "Advanced Live Server: Run Tests",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.deploy",
+        "title": "Advanced Live Server: Deploy",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.openDOMInspector",
+        "title": "Advanced Live Server: Open DOM Inspector",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.analyzeDOM",
+        "title": "Advanced Live Server: Analyze DOM",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.highlightNode",
+        "title": "Advanced Live Server: Highlight Node",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.runUnitTests",
+        "title": "Advanced Live Server: Run Unit Tests",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.runIntegrationTests",
+        "title": "Advanced Live Server: Run Integration Tests",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.runVisualTests",
+        "title": "Advanced Live Server: Run Visual Tests",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.showTestResults",
+        "title": "Advanced Live Server: Show Test Results",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.installPlugin",
+        "title": "Advanced Live Server: Install Plugin",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.uninstallPlugin",
+        "title": "Advanced Live Server: Uninstall Plugin",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.enablePlugin",
+        "title": "Advanced Live Server: Enable Plugin",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.disablePlugin",
+        "title": "Advanced Live Server: Disable Plugin",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.updatePlugin",
+        "title": "Advanced Live Server: Update Plugin",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.searchPlugins",
+        "title": "Advanced Live Server: Search Plugins",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.showPlugins",
+        "title": "Advanced Live Server: Show Plugins",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.startOfflineCloud",
+        "title": "Advanced Live Server: Start Offline Cloud",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.stopOfflineCloud",
+        "title": "Advanced Live Server: Stop Offline Cloud",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.showCloudAnalytics",
+        "title": "Advanced Live Server: Show Cloud Analytics",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.showQuickActions",
+        "title": "Advanced Live Server: Show Quick Actions",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.captureScreenshot",
+        "title": "Advanced Live Server: Capture Screenshot",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.captureFullPageScreenshot",
+        "title": "Advanced Live Server: Capture Full Page Screenshot",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.captureElementScreenshot",
+        "title": "Advanced Live Server: Capture Element Screenshot",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.openScreenshotManager",
+        "title": "Advanced Live Server: Screenshot Manager",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.downloadAIModels",
+        "title": "HyperServer AI: Download Models",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.showAIModels",
+        "title": "HyperServer AI: Show Installed Models",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.updateAIModels",
+        "title": "HyperServer AI: Update Models",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.showLicenseStatus",
+        "title": "Advanced Live Server: Show License Status",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.enterLicenseKey",
+        "title": "Advanced Live Server: Enter License Key",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.showPremiumStatus",
+        "title": "Advanced Live Server: Show Premium Status",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.showFeatureComparison",
+        "title": "Advanced Live Server: Show Feature Comparison",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.showUpgradePrompt",
+        "title": "Advanced Live Server: Show Upgrade Benefits",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.startCollaboration",
+        "title": "Advanced Live Server: Start Team Collaboration",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.joinCollaboration",
+        "title": "Advanced Live Server: Join Team Collaboration",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.stopCollaboration",
+        "title": "Advanced Live Server: Stop Team Collaboration",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.showAnalytics",
+        "title": "Advanced Live Server: Show Analytics Dashboard",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.exportAnalytics",
+        "title": "Advanced Live Server: Export Analytics Data",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.generateAnalyticsReport",
+        "title": "Advanced Live Server: Generate Analytics Report",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.addCustomDomain",
+        "title": "Advanced Live Server: Add Custom Domain",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.manageCustomDomains",
+        "title": "Advanced Live Server: Manage Custom Domains",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.verifyCustomDomain",
+        "title": "Advanced Live Server: Verify Custom Domain",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.createSupportTicket",
+        "title": "Advanced Live Server: Create Support Ticket",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.createFeatureRequest",
+        "title": "Advanced Live Server: Create Feature Request",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.showSupportDashboard",
+        "title": "Advanced Live Server: Show Support Dashboard",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.openProPurchase",
+        "title": "Advanced Live Server: Get Pro License",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.openEnterprisePurchase",
+        "title": "Advanced Live Server: Get Enterprise License",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.showWelcome",
+        "title": "Advanced Live Server: Show Welcome",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.downloadCodeAnalyzers",
+        "title": "Advanced Live Server: Download Code Analyzers",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.showCodeAnalyzers",
+        "title": "Advanced Live Server: Show Code Analyzers",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.updateCodeAnalyzers",
+        "title": "Advanced Live Server: Update Code Analyzers",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.analyzeProject",
+        "title": "Advanced Live Server: Analyze Project",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.analyzeProjectAccessibility",
+        "title": "Advanced Live Server: Analyze Project Accessibility",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.analyzeProjectSecurity",
+        "title": "Advanced Live Server: Analyze Project Security",
+        "category": "Advanced Live Server"
+      },
+      {
+        "command": "advancedLiveServer.analyzeProjectPerformance",
+        "title": "Advanced Live Server: Analyze Project Performance",
+        "category": "Advanced Live Server"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "advancedLiveServer.openCurrentFile",
+          "group": "navigation",
+          "when": "resourceExtname =~ /\\.(html|htm|css|js|jsx|ts|tsx|vue|svelte)$/i"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "advancedLiveServer.openCurrentFile",
+          "group": "navigation",
+          "when": "resourceExtname =~ /\\.(html|htm|css|js|jsx|ts|tsx|vue|svelte)$/i"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Advanced Live Server",
+      "properties": {
+        "advancedLiveServer.port": {
+          "type": "number",
+          "default": 5500,
+          "description": "Port to run the server on"
+        },
+        "advancedLiveServer.https": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable HTTPS with self-signed certificates"
+        },
+        "advancedLiveServer.spa": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable SPA mode with history API fallback"
+        },
+        "advancedLiveServer.openBrowser": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically open browser when server starts"
+        },
+        "advancedLiveServer.showOverlay": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show developer tools overlay in browser"
+        },
+        "advancedLiveServer.watchPatterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "**/*.html",
+            "**/*.css",
+            "**/*.js"
+          ],
+          "description": "File patterns to watch for changes"
+        },
+        "advancedLiveServer.ignorePatterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "**/node_modules/**",
+            "**/.git/**"
+          ],
+          "description": "File patterns to ignore"
+        },
+        "advancedLiveServer.ngrokAuthToken": {
+          "type": "string",
+          "default": "",
+          "description": "ngrok authentication token for cloud preview (optional)"
+        },
+        "advancedLiveServer.enableCloudPreview": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable cloud preview with ngrok tunneling"
+        },
+        "advancedLiveServer.proxy": {
+          "type": "object",
+          "default": {},
+          "description": "API proxy rules mapping paths to target URLs"
+        },
+        "advancedLiveServer.aiMode": {
+          "type": "string",
+          "default": "local",
+          "enum": [
+            "local",
+            "cloud",
+            "hybrid"
+          ],
+          "description": "AI mode: local (fast, free, offline), cloud (powerful, requires API), hybrid (best of both)"
+        },
+        "advancedLiveServer.aiProvider": {
+          "type": "string",
+          "default": "openai",
+          "description": "AI model provider (openai, anthropic, ollama, local, gemini, cohere, mistral, perplexity, together, huggingface, openrouter, groq, deepseek, fireworks, nomic, custom)"
+        },
+        "advancedLiveServer.aiModel": {
+          "type": "string",
+          "default": "gpt-4",
+          "description": "AI model name (e.g., gpt-4, claude-3, etc.)"
+        },
+        "advancedLiveServer.aiApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for the selected AI provider"
+        },
+        "advancedLiveServer.aiBaseUrl": {
+          "type": "string",
+          "default": "",
+          "description": "Custom base URL for self-hosted or local AI models"
+        },
+        "advancedLiveServer.aiTemperature": {
+          "type": "number",
+          "default": 0.7,
+          "description": "AI response creativity (temperature)"
+        },
+        "advancedLiveServer.aiMaxTokens": {
+          "type": "number",
+          "default": 2048,
+          "description": "Maximum tokens for AI responses"
+        },
+        "advancedLiveServer.aiEnableErrorExplanation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable AI-powered error explanation"
+        },
+        "advancedLiveServer.aiEnableCodeSuggestions": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable AI-powered code suggestions"
+        },
+        "advancedLiveServer.aiEnableAccessibilityAnalysis": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable AI-powered accessibility analysis"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "lint:fix": "eslint src --ext ts --fix",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\" \"test-project/**/*.{html,css,js}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json}\" \"test-project/**/*.{html,css,js}\"",
+    "test": "node ./out/test/runTest.js",
+    "build": "npm run compile",
+    "fix-all": "npm run format && npm run lint:fix"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.23",
+    "@types/mime-types": "^3.0.1",
+    "@types/multer": "^2.0.0",
+    "@types/node": "16.x",
+    "@types/qrcode": "^1.5.5",
+    "@types/vscode": "^1.74.0",
+    "@types/ws": "^8.18.1",
+    "@typescript-eslint/eslint-plugin": "^8.36.0",
+    "@typescript-eslint/parser": "^8.36.0",
+    "eslint": "^9.31.0",
+    "prettier": "^3.6.2",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "http-proxy-middleware": "^2.0.6",
+    "mime-types": "^2.1.35",
+    "multer": "^2.0.1",
+    "ngrok": "^5.0.0-beta.2",
+    "puppeteer": "^24.12.1",
+    "qrcode": "^1.5.3",
+    "selfsigned": "^2.1.1",
+    "ws": "^8.13.0"
+  }
+}
