@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "models": [
+    "codebert-base",
+    "codet5-base",
+    "accessibility-checker",
+    "performance-analyzer"
+  ],
+  "totalSize": 352,
+  "downloadDate": "2025-07-12T23:51:21.382Z"
+}

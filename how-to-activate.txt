@@ -1,0 +1,9 @@
+# Advanced Live Server – Premium Feature Installation
+
+1. Install the free version of Advanced Live Server from the VSCode Marketplace.
+2. Download and extract this premium pack ZIP.
+3. Open a terminal in the extension’s root directory.
+4. Run:
+   node scripts/install-premium.js
+5. Enter the path to the extracted premium pack folder when prompted.
+6. Reload VSCode. Enjoy your premium features!

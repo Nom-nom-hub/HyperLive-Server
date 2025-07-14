@@ -1,0 +1,37 @@
+{
+  "name": "advanced-live-server-installer",
+  "version": "1.0.2",
+  "description": "Auto-installer for Advanced Live Server VS Code Extension",
+  "main": "index.js",
+  "bin": {
+    "install-advanced-live-server": "./bin/install.js"
+  },
+  "scripts": {
+    "install": "node ./bin/install.js",
+    "postinstall": "node ./bin/postinstall.js"
+  },
+  "keywords": [
+    "vscode",
+    "extension",
+    "live-server",
+    "development",
+    "auto-install"
+  ],
+  "author": "codeteck",
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^11.1.1",
+    "path": "^0.12.7"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Nom-nom-hub/HyperLive-Server"
+  },
+  "bugs": {
+    "url": "https://github.com/Nom-nom-hub/HyperLive-Server/issues"
+  },
+  "homepage": "https://github.com/Nom-nom-hub/HyperLive-Server#readme"
+} 

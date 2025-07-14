@@ -88,9 +88,12 @@ export class AIConfigManager {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
+      // Debug: Log config path and data
+      console.log('[AIConfigManager] Writing config to:', this.configPath);
+      console.log('[AIConfigManager] Config data:', JSON.stringify(this.config, null, 2));
       fs.writeFileSync(this.configPath, JSON.stringify(this.config, null, 2));
     } catch (error) {
-      console.error('Failed to save AI config:', error);
+      console.error('[AIConfigManager] Failed to save AI config:', error);
     }
   }
 
@@ -121,39 +124,63 @@ export class AIConfigManager {
   async validateModelConfig(): Promise<{ valid: boolean; error?: string }> {
     const { modelConfig } = this.config;
 
-    if (
-      modelConfig.provider === 'openai' ||
-      modelConfig.provider === 'anthropic' ||
-      modelConfig.provider === 'gemini' ||
-      modelConfig.provider === 'cohere' ||
-      modelConfig.provider === 'mistral' ||
-      modelConfig.provider === 'perplexity' ||
-      modelConfig.provider === 'together' ||
-      modelConfig.provider === 'huggingface' ||
-      modelConfig.provider === 'openrouter' ||
-      modelConfig.provider === 'groq' ||
-      modelConfig.provider === 'deepseek' ||
-      modelConfig.provider === 'fireworks' ||
-      modelConfig.provider === 'nomic'
-    ) {
-      if (!modelConfig.apiKey) {
-        return {
-          valid: false,
-          error: 'API key is required for cloud AI providers',
-        };
-      }
+    // Only validate if AI features are enabled
+    if (!this.config.enabled) {
+      return { valid: true };
     }
 
-    if (modelConfig.provider === 'ollama' || modelConfig.provider === 'local') {
+    // For local provider, no validation needed
+    if (modelConfig.provider === 'local') {
+      return { valid: true };
+    }
+
+    // For Ollama, only validate if baseUrl is provided and invalid
+    if (modelConfig.provider === 'ollama') {
+      if (modelConfig.baseUrl && !this.isValidUrl(modelConfig.baseUrl)) {
+        return {
+          valid: false,
+          error: 'Invalid Ollama base URL',
+        };
+      }
+      return { valid: true };
+    }
+
+    // For custom provider, require baseUrl
+    if (modelConfig.provider === 'custom') {
       if (!modelConfig.baseUrl) {
         return {
           valid: false,
-          error: 'Base URL is required for Ollama/local models',
+          error: 'Base URL is required for custom provider',
         };
       }
+      if (!this.isValidUrl(modelConfig.baseUrl)) {
+        return {
+          valid: false,
+          error: 'Invalid custom provider base URL',
+        };
+      }
+      return { valid: true };
+    }
+
+    // For all other cloud providers, API key is optional (user can test without it)
+    // Only validate URL if provided
+    if (modelConfig.baseUrl && !this.isValidUrl(modelConfig.baseUrl)) {
+      return {
+        valid: false,
+        error: 'Invalid base URL',
+      };
     }
 
     return { valid: true };
+  }
+
+  private isValidUrl(url: string): boolean {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   getProviderConfig() {

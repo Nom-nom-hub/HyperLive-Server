@@ -1,118 +1,150 @@
-![Advanced Live Server Logo](hyper-logo.png)
+# Advanced Live Server
 
-# 🚀 Advanced Live Server (Open Source Core)
-
-A **modern, open source live server replacement** for VSCode. Enjoy real-time reloading, HTTPS, SPA support, and a clean, intuitive UI—100% free and open source!
+A modern, open source live server for VSCode with AI assistance, team collaboration, and advanced development tools. 100% free and open source.
 
 ---
 
-## ✨ Free Features (Open Source)
-
-- **Live Server**: Real-time browser reload, HTTPS, SPA support
-- **File Watching**: Smart file change detection
-- **Basic Settings**: Configure port, HTTPS, SPA, etc.
-- **Status Bar UI**: One-click start/stop for your server
+## 🚀 Overview
+Advanced Live Server brings instant, secure, and powerful live reloading to your VSCode workflow. Packed with AI features, team collaboration, screenshot capture, and advanced analytics - all completely free and open source.
 
 ---
 
-## 🏆 Premium Features (Pro/Enterprise)
+## ✨ Features
 
-> **The following features are available in the Pro/Enterprise upgrade (not included in this open source core):**
->
-> - AI-powered error analysis, accessibility, and code suggestions
-> - Cloud Preview (public URLs, QR codes, mobile sync)
-> - Visual settings panel
-> - Screenshot tools
-> - DOM inspector
-> - Performance, SEO, and security analysis
-> - Team collaboration, advanced analytics, plugins, CI/CD, custom domains, and more (Enterprise)
->
-> **To unlock these features, [upgrade here](https://teckmaster.gumroad.com/l/advanced-live-server-pro) or see the premium/ directory if you have access.**
+### 🎯 Core Features
+- **Live Reload** - Automatic browser refresh on file changes
+- **HTTPS Support** - Secure local development with self-signed certificates
+- **SPA Support** - History API fallback for single-page applications
+- **Developer Overlay** - Real-time server status and controls
+- **Quick Settings** - Fast configuration changes
 
----
+### 🤖 AI Features
+- **Code Analysis** - AI-powered code review and suggestions
+- **Error Explanation** - Intelligent error analysis and fixes
+- **Accessibility Analysis** - Automated accessibility improvements
+- **Style Suggestions** - CSS and design recommendations
+- **Content Generation** - AI-powered placeholder content
 
-## 🖥️ How to Use (Open Source Core)
+### 👥 Team Collaboration
+- **Real-time Sync** - Collaborate with your team in real-time
+- **Session Sharing** - Share development sessions with session IDs
+- **File Synchronization** - Automatic file change synchronization
+- **Multi-user Support** - Multiple developers can join sessions
 
-### 1. **Live Server**
-- **Start/Stop**: Use the 🚀 "Live Server" status bar button or run `Advanced Live Server: Start Server` / `Stop Server`.
-- **Auto-reload**: Edit files and see instant browser refresh.
-- **HTTPS**: Enabled by default for secure local development.
-- **SPA Mode**: Supports history API fallback for single-page apps.
-
-### 2. **Basic Settings**
-- **Open Settings**: `Advanced Live Server: Open Settings`
-- **Quick Settings**: `Advanced Live Server: Quick Settings`
-
-### 3. **Status Bar Buttons**
-- **Start/Stop Server**: 🚀 / ⏹️
-- **All major actions are one click away!**
+### 📸 Advanced Tools
+- **Screenshot Capture** - Full page, viewport, or element screenshots
+- **Analytics Dashboard** - Performance monitoring and usage stats
+- **Custom Domains** - Use your own domains for previews
+- **Cloud Preview** - Public URLs with ngrok integration
 
 ---
 
-## 🛡️ Licensing & Upgrades
+## 🛠️ Installation
 
-- **This open source version is 100% free and does not require a license.**
-- **To unlock Pro/Enterprise features, [purchase a license](https://teckmaster.gumroad.com/l/advanced-live-server-pro) and use the premium/ directory (if available).**
+### Option 1: NPM Auto-Installer (Recommended)
+```bash
+npm install -g advanced-live-server-installer
+```
+Then restart VS Code and you're ready to go!
 
----
+### Option 2: Manual Installation
+1. **Clone** this repository
+2. **Install dependencies**: `npm install`
+3. **Compile**: `npm run compile`
+4. **Run installer**: `cd package-installer && node bin/install.js`
+5. **Restart** VS Code
 
-## 🛠️ Installation & Setup
-
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   cd HyperLive-Server
-   ```
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-3. **Compile the extension:**
-   ```bash
-   npm run compile
-   ```
-4. **Run in VSCode:**
-   - Open the project in VSCode
-   - Press `F5` to run in debug mode
-   - Or use `Ctrl+Shift+P` → "Developer: Reload Window"
+### Option 3: Direct Download
+Download the latest `.vsix` from [Releases](https://github.com/Nom-nom-hub/HyperLive-Server/releases) and install manually.
 
 ---
 
-## 📖 Quick Start
+## 🚦 Usage
 
-1. **Open a folder in VSCode**
-2. **Click the 🚀 "Live Server" status bar button**
-3. **Select "Start Server"**
-4. **Your site opens at** `http://localhost:5500`
-5. **Use the status bar or Command Palette for all other features**
+### Quick Start
+1. **Open** your project folder in VS Code
+2. **Start server**: Command Palette → `Advanced Live Server: Start Server`
+3. **Or right-click** an HTML file and select "Open with Advanced Live Server"
 
----
+### AI Features
+- **Analyze Code**: Command Palette → `Advanced Live Server: Analyze Code with AI`
+- **Improve Styles**: Command Palette → `Advanced Live Server: Improve Styles with AI`
+- **Generate Content**: Command Palette → `Advanced Live Server: Generate Content with AI`
 
-## 💬 Support & Feedback
+### Team Collaboration
+- **Start Session**: Command Palette → `Advanced Live Server: Start Collaboration`
+- **Join Session**: Command Palette → `Advanced Live Server: Join Collaboration`
+- **Share Session ID** with your team
 
-- **Feature requests**: Use GitHub issues
-- **Premium support**: Available for Pro/Enterprise users
-- **Documentation**: See the [Wiki](#) or built-in help
-
----
-
-## 🔒 Security & Privacy
-
-- **No telemetry**: 100% open source, no tracking
-- **No external API calls**: All free features run locally
+### Screenshots & Analytics
+- **Take Screenshot**: Command Palette → `Advanced Live Server: Take Screenshot`
+- **View Analytics**: Command Palette → `Advanced Live Server: Show Analytics`
 
 ---
 
-## 🚀 Want More?
+## ⚙️ Configuration
 
-**Upgrade to Pro/Enterprise to unlock AI, cloud, collaboration, and more!**
-- [Get Pro License](https://teckmaster.gumroad.com/l/advanced-live-server-pro)
-- [Get Enterprise License](https://teckmaster.gumroad.com/l/advanced-live-server-enterprise)
-- [Feature Comparison](https://teckmaster.gumroad.com/l/advanced-live-server-pro)
+Configure settings in VS Code settings under "Advanced Live Server":
+
+```json
+{
+  "advancedLiveServer.port": 5500,
+  "advancedLiveServer.https": false,
+  "advancedLiveServer.spa": false,
+  "advancedLiveServer.openBrowser": true
+}
+```
 
 ---
 
-**This repository contains only the open source core. Premium features are available separately.**
+## 🔒 Privacy & Security
+- **No telemetry or tracking**
+- **No remote code execution**
+- **All features run locally**
+- **No user data collection**
+- **100% open source and transparent**
+
+See [SECURITY.md](./SECURITY.md) for full details.
+
+---
+
+## 🖼️ Screenshots
+<!-- Add screenshots or animated GIFs here -->
+![Live Reload Demo](https://raw.githubusercontent.com/Nom-nom-hub/HyperLive-Server/main/screenshots/demo.gif)
+
+---
+
+## 🆘 Support & Links
+- **Source Code:** [GitHub](https://github.com/Nom-nom-hub/HyperLive-Server)
+- **Report Issues:** [GitHub Issues](https://github.com/Nom-nom-hub/HyperLive-Server/issues)
+- **Documentation:** Run "Advanced Live Server: Show Welcome" in VS Code
+- **Security Policy:** [SECURITY.md](./SECURITY.md)
+
+---
+
+## 🤝 Contributing
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+---
+
+## 📜 License
+MIT License - 100% Free & Open Source. See [LICENSE](./LICENSE) for details.
+
+---
+
+## 📋 Changelog
+See [CHANGELOG.md](./CHANGELOG.md) for release notes.
+
+---
+
+## ❤️ Support the Project
+If you find this extension helpful, please:
+- ⭐ Star this repository
+- 🐛 Report bugs and request features
+- 💬 Share with your developer friends
+- 🤝 Contribute code or documentation
+
+**Made with ❤️ by the open source community**
 
 
 

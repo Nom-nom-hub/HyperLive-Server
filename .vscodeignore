@@ -16,7 +16,7 @@ out/**/*.map
 .prettierrc
 tsconfig.json
 *.ts
-!src/**/*.ts
+*.map
 
 # Documentation
 README.md
@@ -96,12 +96,9 @@ screenshots/
 *.vsix
 *.tgz
 
-# Source maps (keep only for debugging)
+# Source maps and TypeScript declaration files
 **/*.map
-
-# TypeScript declaration files (not needed in extension)
 **/*.d.ts
-!src/**/*.d.ts
 
 # Large binary files
 *.png
@@ -110,13 +107,13 @@ screenshots/
 *.gif
 *.svg
 *.ico
-!src/**/*.png
-!src/**/*.jpg
-!src/**/*.jpeg
-!src/**/*.gif
-!src/**/*.svg
-!src/**/*.ico
+!hyper-logo.png
+
+# Exclude premium code from Marketplace package
+premium/
 
 # Exclude specific large files
-hyper-logo.png
 index.html 
+
+# Exclude TypeScript source files from VSIX
+src/ 

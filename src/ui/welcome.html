@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 Welcome to Advanced Live Server!</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #222;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 16px 64px 16px;
+        }
+        .header {
+            background: rgba(255,255,255,0.97);
+            border-radius: 18px;
+            padding: 40px 24px 32px 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header p {
+            font-size: 1.25rem;
+            color: #555;
+        }
+        .toc {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 18px 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.07);
+        }
+        .toc h2 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+        .toc ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            columns: 2;
+        }
+        .toc li {
+            margin-bottom: 8px;
+        }
+        .toc a {
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        .section {
+            background: rgba(255,255,255,0.98);
+            border-radius: 14px;
+            padding: 32px 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 24px rgba(102,126,234,0.07);
+        }
+        .section h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 18px;
+        }
+        .section h3 {
+            color: #764ba2;
+            margin-top: 24px;
+            margin-bottom: 10px;
+        }
+        .code-block {
+            background: #f4f4f4;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.98rem;
+            overflow-x: auto;
+            margin: 12px 0 18px 0;
+        }
+        .tip, .faq {
+            background: #e6f0ff;
+            border-left: 4px solid #667eea;
+            padding: 12px 18px;
+            border-radius: 7px;
+            margin: 16px 0;
+            color: #333;
+        }
+        .faq {
+            background: #fffbe6;
+            border-left: 4px solid #feca57;
+        }
+        .screenshot {
+            display: block;
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 18px 0;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.08);
+        }
+        .footer {
+            text-align: center;
+            color: #888;
+            font-size: 0.95rem;
+            margin-top: 48px;
+        }
+        @media (max-width: 700px) {
+            .toc ul { columns: 1; }
+            .container { padding: 8px; }
+            .header h1 { font-size: 2rem; }
+            .section h2 { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎉 Welcome to Advanced Live Server!</h1>
+            <p>Your complete guide to every feature, workflow, and pro tip. 100% Free & Open Source.</p>
+        </header>
+        <nav class="toc">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#quickstart">Quick Start</a></li>
+                <li><a href="#livereload">Live Reload</a></li>
+                <li><a href="#ai">AI Features</a></li>
+                <li><a href="#screenshots">Screenshots</a></li>
+                <li><a href="#collab">Team Collaboration</a></li>
+                <li><a href="#analytics">Analytics</a></li>
+                <li><a href="#settings">Settings & Customization</a></li>
+                <li><a href="#shortcuts">Keyboard Shortcuts</a></li>
+                <li><a href="#troubleshooting">Troubleshooting & FAQ</a></li>
+                <li><a href="#support">Support & Community</a></li>
+            </ul>
+        </nav>
+        <section class="section" id="quickstart">
+            <h2>🚀 Quick Start</h2>
+            <ol>
+                <li>Open your project folder in VS Code.</li>
+                <li>Press <b>Ctrl+Shift+P</b> (Cmd+Shift+P on Mac) and type <b>Advanced Live Server: Start Server</b>.</li>
+                <li>Your default browser opens with live reload enabled.</li>
+                <li>Edit and save any HTML, CSS, or JS file—your browser updates instantly!</li>
+            </ol>
+            <div class="tip">You can also use the status bar button or Quick Actions menu for one-click server control.</div>
+        </section>
+        <section class="section" id="livereload">
+            <h2>🔄 Live Reload</h2>
+            <h3>How it works</h3>
+            <ul>
+                <li>Watches your project files for changes (HTML, CSS, JS, images, etc.).</li>
+                <li>Automatically reloads the browser tab when you save a file.</li>
+                <li>Supports cache-busting, SPA fallback, and custom reload scripts.</li>
+            </ul>
+            <h3>Advanced Usage</h3>
+            <ul>
+                <li>Configure file types to watch in <b>Settings &rarr; Extensions &rarr; Advanced Live Server</b>.</li>
+                <li>Enable/disable SPA mode for single-page apps.</li>
+                <li>Use the <b>Restart Server</b> command to reload config without restarting VS Code.</li>
+            </ul>
+            <div class="code-block">// Example: Custom reload script
+window.addEventListener('liveServerReload', () => {
+  // Custom logic here
+});
+</div>
+            <div class="tip">If live reload isn’t working, check the Troubleshooting section below.</div>
+        </section>
+        <section class="section" id="ai">
+            <h2>🤖 AI Features</h2>
+            <h3>What you can do</h3>
+            <ul>
+                <li>Analyze code for bugs, improvements, and best practices.</li>
+                <li>Get CSS and style suggestions for your site.</li>
+                <li>Generate content, documentation, and placeholder text.</li>
+                <li>Choose from multiple AI providers (OpenAI, Ollama, OpenRouter, Local, Custom).</li>
+            </ul>
+            <h3>How to use</h3>
+            <ol>
+                <li>Open any file in the editor or browser preview.</li>
+                <li>Run a command like <b>Advanced Live Server: Analyze Code with AI</b> or <b>Improve Styles with AI</b>.</li>
+                <li>View suggestions in a side panel or inline.</li>
+            </ol>
+            <div class="tip">Configure your AI provider and API key in <b>AI Settings</b> (Quick Actions &rarr; AI Settings).</div>
+            <div class="code-block">// Example: Analyze code
+// Select code, then run:
+// Advanced Live Server: Analyze Code with AI
+</div>
+        </section>
+        <section class="section" id="screenshots">
+            <h2>📸 Screenshots</h2>
+            <h3>Capture Options</h3>
+            <ul>
+                <li>Full page, viewport, or specific element (by CSS selector).</li>
+                <li>Choose format: PNG, JPEG, WebP.</li>
+                <li>Set quality, add custom CSS, hide elements, and more.</li>
+            </ul>
+            <h3>How to use</h3>
+            <ol>
+                <li>Open the page you want to capture in the browser.</li>
+                <li>Use the Quick Actions menu or run <b>Take Screenshot</b> command.</li>
+                <li>Choose your options and save the image.</li>
+            </ol>
+            <div class="code-block">// Example: Capture element
+{
+  selector: '.header',
+  format: 'png',
+  quality: 90
+}
+</div>
+            <div class="tip">Screenshots are saved to your project folder by default.</div>
+        </section>
+        <section class="section" id="collab">
+            <h2>👥 Team Collaboration</h2>
+            <h3>How it works</h3>
+            <ul>
+                <li>Start a session and share the session ID with your team.</li>
+                <li>Real-time sync of file changes, server state, and browser preview.</li>
+                <li>See who’s connected and manage sessions from the status bar or Quick Actions.</li>
+            </ul>
+            <h3>How to use</h3>
+            <ol>
+                <li>Start a session: <b>Start Collaboration</b> from Quick Actions or Command Palette.</li>
+                <li>Share the session ID (copy from status bar or session info).</li>
+                <li>Teammates join using <b>Join Collaboration</b> and the session ID.</li>
+                <li>Stop the session anytime from the status bar or Quick Actions.</li>
+            </ol>
+            <div class="tip">Collaboration is local-first and privacy-friendly. No data leaves your machine unless you use Cloud Preview.</div>
+        </section>
+        <section class="section" id="analytics">
+            <h2>📊 Analytics</h2>
+            <h3>What you get</h3>
+            <ul>
+                <li>Performance stats: uptime, load time, file changes, and more.</li>
+                <li>Usage analytics for your project (local only, unless cloud enabled).</li>
+                <li>Export reports in JSON, CSV, or HTML.</li>
+            </ul>
+            <h3>How to use</h3>
+            <ol>
+                <li>Open the Analytics Dashboard from Quick Actions or Command Palette.</li>
+                <li>View stats, trends, and export options.</li>
+            </ol>
+            <div class="tip">Analytics are private by default. Enable Cloud Preview to share stats with your team.</div>
+        </section>
+        <section class="section" id="settings">
+            <h2>⚙️ Settings & Customization</h2>
+            <h3>Server Settings</h3>
+            <ul>
+                <li>Change port, host, HTTPS, SPA mode, and more in <b>Settings &rarr; Extensions &rarr; Advanced Live Server</b>.</li>
+                <li>Use <b>Quick Settings</b> for fast changes from the Quick Actions menu.</li>
+            </ul>
+            <h3>AI Settings</h3>
+            <ul>
+                <li>Choose your AI provider, set API keys, and adjust model options.</li>
+                <li>Access via Quick Actions &rarr; AI Settings.</li>
+            </ul>
+            <h3>Advanced Customization</h3>
+            <ul>
+                <li>Custom reload scripts, middleware, and plugin support (see docs).</li>
+            </ul>
+        </section>
+        <section class="section" id="shortcuts">
+            <h2>⌨️ Keyboard Shortcuts</h2>
+            <ul>
+                <li><b>Ctrl+Shift+L</b> — Start Server</li>
+                <li><b>Ctrl+Shift+K</b> — Stop Server</li>
+                <li><b>Ctrl+Shift+R</b> — Restart Server</li>
+                <li><b>Ctrl+Shift+O</b> — Open in Browser</li>
+                <li><b>Ctrl+Shift+A</b> — Show Quick Actions</li>
+                <li><b>Ctrl+Shift+I</b> — Inspect Element</li>
+                <li><b>Ctrl+Shift+S</b> — Take Screenshot</li>
+                <li><b>Ctrl+Shift+C</b> — Start Collaboration</li>
+            </ul>
+            <div class="tip">You can customize shortcuts in VS Code: File &rarr; Preferences &rarr; Keyboard Shortcuts.</div>
+        </section>
+        <section class="section" id="troubleshooting">
+            <h2>🛠️ Troubleshooting & FAQ</h2>
+            <div class="faq"><b>Live reload isn’t working?</b><br>Make sure your file is saved, and check that the server is running. Try restarting the server or VS Code. See logs in the Output panel (Advanced Live Server channel).</div>
+            <div class="faq"><b>AI features not working?</b><br>Check your AI provider settings and API key. Some providers require a valid key and internet connection.</div>
+            <div class="faq"><b>Collaboration issues?</b><br>Ensure all users are on the same network or using Cloud Preview. Share the correct session ID.</div>
+            <div class="faq"><b>Need more help?</b><br>See the Support & Community section below.</div>
+        </section>
+        <section class="section" id="support">
+            <h2>💬 Support & Community</h2>
+            <ul>
+                <li><b>Documentation:</b> <a href="https://github.com/Nom-nom-hub/HyperLive-Server#readme" target="_blank">Project README</a></li>
+                <li><b>Report Issues:</b> <a href="https://github.com/Nom-nom-hub/HyperLive-Server/issues" target="_blank">GitHub Issues</a></li>
+                <li><b>Community Chat:</b> <a href="https://discord.gg/your-invite" target="_blank">Discord</a> (coming soon)</li>
+            </ul>
+            <div class="tip">We love feedback! Suggest features or improvements any time.</div>
+        </section>
+        <footer class="footer">
+            Made with ❤️ by the Advanced Live Server Team — 100% Free & Open Source
+        </footer>
+    </div>
+    <script>
+        // Smooth scroll for TOC links
+        document.querySelectorAll('.toc a').forEach(a => {
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html> 

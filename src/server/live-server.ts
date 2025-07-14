@@ -64,6 +64,12 @@ export class LiveServer extends EventEmitter {
   }
 
   private setupMiddleware() {
+    // Add request logging middleware
+    this.app.use((req, res, next) => {
+      this.outputChannel.appendLine(`🌐 Incoming request: ${req.method} ${req.path}`);
+      next();
+    });
+
     // CORS
     this.app.use(cors());
 
@@ -81,32 +87,8 @@ export class LiveServer extends EventEmitter {
       });
     }
 
-    // Static file serving
-    this.app.use(
-      express.static(this.rootPath, {
-        index: false, // We'll handle index files manually
-        setHeaders: (res, filePath) => {
-          // Set cache headers for static assets
-          const ext = path.extname(filePath);
-          if (
-            [
-              '.css',
-              '.js',
-              '.png',
-              '.jpg',
-              '.jpeg',
-              '.gif',
-              '.svg',
-              '.ico',
-            ].includes(ext)
-          ) {
-            res.setHeader('Cache-Control', 'public, max-age=31536000');
-          } else {
-            res.setHeader('Cache-Control', 'no-cache');
-          }
-        },
-      })
-    );
+    // Handle all static files through our custom route handlers
+    this.outputChannel.appendLine(`🔧 Static file serving disabled - all files handled by custom routes`);
   }
 
   private setupRoutes() {
@@ -135,6 +117,9 @@ export class LiveServer extends EventEmitter {
 
       this.outputChannel.appendLine(
         `🔍 Request: ${requestPath} -> ${fullPath}`
+      );
+      this.outputChannel.appendLine(
+        `🔍 File exists check: ${fs.existsSync(fullPath)}`
       );
 
       // Check if file exists
@@ -172,11 +157,28 @@ export class LiveServer extends EventEmitter {
 
     this.outputChannel.appendLine(`📄 Serving file: ${filePath} (${contentType})`);
     res.setHeader('Content-Type', contentType);
+    
+    // Add aggressive cache-busting headers for ALL files
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, private');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Last-Modified', new Date().toUTCString());
+    res.setHeader('ETag', `"${Date.now()}"`);
 
     // Inject reload script for HTML files
     if (ext === '.html') {
       let content = fs.readFileSync(filePath, 'utf8');
-      content = injectReloadScript(content, this.config.showOverlay);
+      // Force inject reload script for debugging
+      this.outputChannel.appendLine(`🔧 Forcing reload script injection for: ${filePath}`);
+      content = require('../client/reload-script').injectReloadScript(content, this.config.showOverlay);
+      
+      // Debug: Check if script was actually injected
+      if (content.includes('advanced-live-server-reload')) {
+        this.outputChannel.appendLine(`✅ Reload script successfully injected`);
+      } else {
+        this.outputChannel.appendLine(`❌ Reload script NOT found in injected content`);
+      }
+      
       this.outputChannel.appendLine(`✅ HTML file served with reload script: ${filePath}`);
       res.send(content);
     } else {
@@ -189,7 +191,8 @@ export class LiveServer extends EventEmitter {
     const indexPath = path.join(this.rootPath, 'index.html');
     if (fs.existsSync(indexPath)) {
       let content = fs.readFileSync(indexPath, 'utf8');
-      content = injectReloadScript(content, this.config.showOverlay);
+      this.outputChannel.appendLine(`🔧 Injecting reload script for SPA fallback`);
+      content = require('../client/reload-script').injectReloadScript(content, this.config.showOverlay);
       res.setHeader('Content-Type', 'text/html');
       res.send(content);
     } else {
@@ -395,12 +398,13 @@ export class LiveServer extends EventEmitter {
       this.clients.add(ws);
       this.collabClients.add(ws);
       this.outputChannel.appendLine(
-        `🔗 Client connected (${this.clients.size} total)`
+        `🔗 Client connected (${this.clients.size} total) - WebSocket readyState: ${ws.readyState}`
       );
 
       ws.on('message', data => {
         try {
           const msg = JSON.parse(data.toString());
+          this.outputChannel.appendLine(`📨 Received message from client: ${JSON.stringify(msg)}`);
           if (msg && msg.type && msg.channel === 'collab') {
             this.handleCollabMessage(ws, msg);
           }
@@ -409,11 +413,11 @@ export class LiveServer extends EventEmitter {
         }
       });
 
-      ws.on('close', () => {
+      ws.on('close', (code, reason) => {
         this.clients.delete(ws);
         this.collabClients.delete(ws);
         this.outputChannel.appendLine(
-          `🔌 Client disconnected (${this.clients.size} total)`
+          `🔌 Client disconnected (${this.clients.size} total) - Code: ${code}, Reason: ${reason}`
         );
       });
 
@@ -487,6 +491,12 @@ export class LiveServer extends EventEmitter {
       ignored: this.config.ignorePatterns,
       persistent: true,
       ignoreInitial: true,
+      awaitWriteFinish: {
+        stabilityThreshold: 100,
+        pollInterval: 100
+      },
+      usePolling: true,
+      interval: 100
     });
 
     this.watcher.on('ready', () => {
@@ -519,15 +529,21 @@ export class LiveServer extends EventEmitter {
     const relativePath = path.relative(this.rootPath, filePath);
     const ext = path.extname(filePath);
 
-    this.outputChannel.appendLine(`📝 File changed: ${relativePath}`);
+    this.outputChannel.appendLine(`📝 File changed: ${relativePath} (${ext})`);
+    this.outputChannel.appendLine(`📊 Active clients before notification: ${this.clients.size}`);
     this.emit('fileChanged', relativePath);
 
-    // Notify all connected clients
-    this.notifyClients({
-      type: 'reload',
-      file: relativePath,
-      extension: ext,
-    });
+    // Force a small delay to ensure file is fully written and client is connected
+    setTimeout(() => {
+      // Notify all connected clients with timestamp to force reload
+      this.notifyClients({
+        type: 'reload',
+        file: relativePath,
+        extension: ext,
+        timestamp: Date.now(),
+        force: true
+      });
+    }, 200); // Increased delay to ensure client is fully connected
   }
 
   private notifyClients(message: any) {

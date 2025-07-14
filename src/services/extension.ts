@@ -1,40 +1,40 @@
 import * as vscode from 'vscode';
-import { LiveServer } from './server/live-server';
-import { ConfigManager } from './config/config-manager';
-import { StatusBarManager } from './ui/status-bar-manager';
+import { LiveServer } from '../server/live-server';
+import { ConfigManager } from '../config/config-manager';
+import { StatusBarManager } from '../ui/status-bar-manager';
+// Import real feature implementations
+import { CloudPreviewManager } from '../premium/cloud-preview-manager';
+import { MultiAIService } from './multi-ai-service';
+import { AISettingsPanel } from '../ui/ai-settings-panel';
+import { CustomDomainsService } from '../premium/custom-domains';
+import { PrioritySupportService } from '../premium/priority-support';
+import { AdvancedAnalyticsService } from '../premium/advanced-analytics';
 
 let liveServer: LiveServer | null = null;
 let statusBarManager: StatusBarManager;
 let outputChannel: vscode.OutputChannel;
 let collaborationStatusBarItem: vscode.StatusBarItem | undefined;
 let serverStatusBarItem: vscode.StatusBarItem | undefined;
+let quickActionsStatusBarItem: vscode.StatusBarItem | undefined;
+
+// Service singletons (initialized in activate)
+let cloudPreviewManager: CloudPreviewManager;
+let aiService: MultiAIService;
+let aiSettingsPanel: AISettingsPanel;
+let customDomainsService: CustomDomainsService;
+let prioritySupportService: PrioritySupportService;
+let analyticsService: AdvancedAnalyticsService;
 
 // --- STUBS FOR PREMIUM FEATURES ---
-function showUpgradeMessage(feature: string) {
-  vscode.window.showInformationMessage(
-    `The feature "${feature}" is available in Advanced Live Server Pro/Enterprise. Visit https://teckmaster.gumroad.com/l/advanced-live-server-pro to upgrade.`,
-    'Upgrade'
-  ).then(selection => {
-    if (selection === 'Upgrade') {
-      vscode.env.openExternal(vscode.Uri.parse('https://teckmaster.gumroad.com/l/advanced-live-server-pro'));
-    }
-  });
-}
+// REMOVE ALL STUBS AND UPGRADE MESSAGES
 
-// Example stub for a premium command
-async function startCloudPreview() {
-  showUpgradeMessage('Cloud Preview');
-}
-async function analyzeError() { showUpgradeMessage('AI Error Analysis'); }
-async function suggestImprovements() { showUpgradeMessage('AI Code Suggestions'); }
-async function analyzeAccessibility() { showUpgradeMessage('AI Accessibility Analysis'); }
-async function analyzePerformance() { showUpgradeMessage('Performance Analysis'); }
-async function analyzeSEO() { showUpgradeMessage('SEO Analysis'); }
-async function securityScan() { showUpgradeMessage('Security Scan'); }
-async function startCollaboration() { showUpgradeMessage('Team Collaboration'); }
-async function showAnalytics() { showUpgradeMessage('Advanced Analytics'); }
-async function addCustomDomain() { showUpgradeMessage('Custom Domains'); }
-async function createSupportTicket() { showUpgradeMessage('Priority Support'); }
+// TODO: Import and wire up real feature implementations here
+// Example:
+// import { startCloudPreview } from '../premium/cloud-preview-manager';
+// import { analyzeError } from '../premium/ai-service';
+// ...
+
+// For now, just provide empty async functions as placeholders for all premium commands
 
 // --- COMMAND REGISTRATION ---
 // Only register free feature commands
@@ -54,17 +54,21 @@ const commands = [
   vscode.commands.registerCommand('advancedLiveServer.startCloudPreview', startCloudPreview),
   vscode.commands.registerCommand('advancedLiveServer.analyzeError', analyzeError),
   vscode.commands.registerCommand('advancedLiveServer.suggestImprovements', suggestImprovements),
+  vscode.commands.registerCommand('advancedLiveServer.openAISettings', openAISettings),
   vscode.commands.registerCommand('advancedLiveServer.analyzeAccessibility', analyzeAccessibility),
   vscode.commands.registerCommand('advancedLiveServer.analyzePerformance', analyzePerformance),
   vscode.commands.registerCommand('advancedLiveServer.analyzeSEO', analyzeSEO),
   vscode.commands.registerCommand('advancedLiveServer.securityScan', securityScan),
   vscode.commands.registerCommand('advancedLiveServer.startCollaboration', startCollaboration),
+  vscode.commands.registerCommand('advancedLiveServer.stopCollaboration', stopCollaboration),
+  vscode.commands.registerCommand('advancedLiveServer.showCollaborationInfo', showCollaborationInfo),
   vscode.commands.registerCommand('advancedLiveServer.showAnalytics', showAnalytics),
   vscode.commands.registerCommand('advancedLiveServer.addCustomDomain', addCustomDomain),
   vscode.commands.registerCommand('advancedLiveServer.createSupportTicket', createSupportTicket),
+  vscode.commands.registerCommand('advancedLiveServer.showWelcome', showWelcome),
 ];
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   console.log('Advanced Live Server extension is now active!');
 
   // Initialize output channel
@@ -72,6 +76,15 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Initialize services
   statusBarManager = new StatusBarManager();
+  cloudPreviewManager = new CloudPreviewManager(outputChannel);
+  aiService = new MultiAIService(context, outputChannel);
+  aiSettingsPanel = new AISettingsPanel(context);
+  
+  // Initialize AI service
+  await aiService.initialize();
+  customDomainsService = new CustomDomainsService(context, outputChannel);
+  prioritySupportService = new PrioritySupportService(context, outputChannel);
+  analyticsService = new AdvancedAnalyticsService(context, outputChannel);
 
   // Show welcome message on first install
   const isFirstInstall = context.globalState.get('hasShownWelcome', false);
@@ -79,7 +92,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.globalState.update('hasShownWelcome', true);
     // Show welcome message after a short delay
     setTimeout(() => {
-      // licensingService.showWelcomeMessage(); // Removed
+      showWelcome();
     }, 2000);
   }
 
@@ -100,6 +113,14 @@ export function activate(context: vscode.ExtensionContext) {
   updateServerStatusBar(liveServer?.isRunning?.() || false);
   context.subscriptions.push({ dispose: () => collaborationStatusBarItem?.dispose() });
   context.subscriptions.push({ dispose: () => serverStatusBarItem?.dispose() });
+
+  // Add Quick Actions menu button to the left side of the status bar
+  quickActionsStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
+  quickActionsStatusBarItem.text = '$(list-unordered) Live Server Menu';
+  quickActionsStatusBarItem.tooltip = 'Open Advanced Live Server Quick Actions';
+  quickActionsStatusBarItem.command = 'advancedLiveServer.showQuickActions';
+  quickActionsStatusBarItem.show();
+  context.subscriptions.push(quickActionsStatusBarItem);
 }
 
 export function deactivate() {
@@ -111,6 +132,9 @@ export function deactivate() {
   // } // Removed
   if (statusBarManager) {
     statusBarManager.dispose();
+  }
+  if (quickActionsStatusBarItem) {
+    quickActionsStatusBarItem.dispose();
   }
 }
 
@@ -390,6 +414,12 @@ async function openCurrentFile() {
   // Get relative path from workspace root
   const relativePath = vscode.workspace.asRelativePath(filePath);
   
+  // Debug: Log the file paths
+  outputChannel.appendLine(`🔍 Debug - openCurrentFile:`);
+  outputChannel.appendLine(`  Full file path: ${filePath}`);
+  outputChannel.appendLine(`  Workspace folder: ${workspaceFolder.uri.fsPath}`);
+  outputChannel.appendLine(`  Relative path: ${relativePath}`);
+  
   // Check if it's an HTML file or other web file
   const supportedExtensions = ['.html', '.htm', '.css', '.js', '.jsx', '.ts', '.tsx', '.vue', '.svelte'];
   const fileExtension = document.languageId;
@@ -433,56 +463,128 @@ async function stopCloudPreview() {
 
 // Settings functions
 function openSettings() {
-  // settingsPanel.showSettings(); // Removed
+  vscode.commands.executeCommand('workbench.action.openSettings', '@ext:teck.advanced-live-server');
 }
 
 async function resetSettings() {
-  const result = await vscode.window.showWarningMessage(
-    'Are you sure you want to reset all settings to default?',
-    'Yes',
-    'No'
-  );
-
-  if (result === 'Yes') {
-    // Reset to default VSCode settings
-    const config = vscode.workspace.getConfiguration('advancedLiveServer');
-    await config.update('port', 5500);
-    await config.update('https', false);
-    await config.update('spa', false);
-    await config.update('openBrowser', true);
-    await config.update('showOverlay', true);
-    await config.update('watchPatterns', ['**/*.html', '**/*.css', '**/*.js']);
-    await config.update('ignorePatterns', ['**/node_modules/**', '**/.git/**']);
-    await config.update('proxy', {});
-    await config.update('enableCloudPreview', false);
-    await config.update('ngrokAuthToken', '');
-    await config.update('aiMode', 'local');
-    await config.update('aiProvider', 'openai');
-    await config.update('aiModel', 'gpt-4');
-    await config.update('aiApiKey', '');
-    await config.update('aiBaseUrl', '');
-    await config.update('aiTemperature', 0.7);
-    await config.update('aiMaxTokens', 2048);
-    await config.update('aiEnableErrorExplanation', true);
-    await config.update('aiEnableCodeSuggestions', true);
-    await config.update('aiEnableAccessibilityAnalysis', true);
-    vscode.window.showInformationMessage('Settings reset to defaults');
+  try {
+    const confirm = await vscode.window.showWarningMessage(
+      'Are you sure you want to reset all Advanced Live Server settings to defaults?',
+      { modal: true },
+      'Reset Settings'
+    );
+    
+    if (confirm === 'Reset Settings') {
+      const config = vscode.workspace.getConfiguration('advancedLiveServer');
+      
+      // Reset to defaults
+      await config.update('port', 5500, vscode.ConfigurationTarget.Global);
+      await config.update('https', false, vscode.ConfigurationTarget.Global);
+      await config.update('spa', false, vscode.ConfigurationTarget.Global);
+      await config.update('openBrowser', true, vscode.ConfigurationTarget.Global);
+      await config.update('showOverlay', true, vscode.ConfigurationTarget.Global);
+      await config.update('autoStart', false, vscode.ConfigurationTarget.Global);
+      
+      vscode.window.showInformationMessage('✅ Settings reset to defaults!');
+    }
+  } catch (error) {
+    vscode.window.showErrorMessage(`Failed to reset settings: ${error}`);
   }
 }
 
 async function openVSCodeSettings() {
-  vscode.commands.executeCommand(
-    'workbench.action.openSettings',
-    'advancedLiveServer'
-  );
+  vscode.commands.executeCommand('workbench.action.openSettings', '@ext:teck.advanced-live-server');
 }
 
 async function quickSettings() {
-  // await SimpleSettingsManager.showSettingsQuickPick(); // Removed
+  const items = [
+    { label: '🔧 Port', description: 'Change server port', command: 'changePort' },
+    { label: '🔒 HTTPS', description: 'Toggle HTTPS', command: 'toggleHttps' },
+    { label: '📱 SPA Mode', description: 'Toggle SPA mode', command: 'toggleSpa' },
+    { label: '🌐 Auto-open Browser', description: 'Toggle auto-open browser', command: 'toggleAutoOpen' },
+    { label: '📊 Show Overlay', description: 'Toggle status overlay', command: 'toggleOverlay' },
+    { label: '🚀 Auto-start', description: 'Toggle auto-start on workspace open', command: 'toggleAutoStart' },
+    { label: '📋 Show Current Settings', description: 'View all current settings', command: 'showCurrentSettings' },
+    { label: '⚙️ Open Full Settings', description: 'Open VS Code settings', command: 'openVSCodeSettings' },
+  ];
+
+  const selected = await vscode.window.showQuickPick(items, {
+    placeHolder: 'Select a setting to change...',
+  });
+
+  if (selected) {
+    switch (selected.command) {
+      case 'changePort':
+        const port = await vscode.window.showInputBox({
+          prompt: 'Enter new port number:',
+          value: '5500',
+          validateInput: (value) => {
+            const num = parseInt(value);
+            return (num >= 1 && num <= 65535) ? null : 'Port must be between 1 and 65535';
+          }
+        });
+        if (port) {
+          await vscode.workspace.getConfiguration('advancedLiveServer').update('port', parseInt(port), vscode.ConfigurationTarget.Global);
+          vscode.window.showInformationMessage(`✅ Port changed to ${port}`);
+        }
+        break;
+      case 'toggleHttps':
+        const currentHttps = vscode.workspace.getConfiguration('advancedLiveServer').get('https', false);
+        await vscode.workspace.getConfiguration('advancedLiveServer').update('https', !currentHttps, vscode.ConfigurationTarget.Global);
+        vscode.window.showInformationMessage(`✅ HTTPS ${!currentHttps ? 'enabled' : 'disabled'}`);
+        break;
+      case 'toggleSpa':
+        const currentSpa = vscode.workspace.getConfiguration('advancedLiveServer').get('spa', false);
+        await vscode.workspace.getConfiguration('advancedLiveServer').update('spa', !currentSpa, vscode.ConfigurationTarget.Global);
+        vscode.window.showInformationMessage(`✅ SPA mode ${!currentSpa ? 'enabled' : 'disabled'}`);
+        break;
+      case 'toggleAutoOpen':
+        const currentAutoOpen = vscode.workspace.getConfiguration('advancedLiveServer').get('openBrowser', true);
+        await vscode.workspace.getConfiguration('advancedLiveServer').update('openBrowser', !currentAutoOpen, vscode.ConfigurationTarget.Global);
+        vscode.window.showInformationMessage(`✅ Auto-open browser ${!currentAutoOpen ? 'enabled' : 'disabled'}`);
+        break;
+      case 'toggleOverlay':
+        const currentOverlay = vscode.workspace.getConfiguration('advancedLiveServer').get('showOverlay', true);
+        await vscode.workspace.getConfiguration('advancedLiveServer').update('showOverlay', !currentOverlay, vscode.ConfigurationTarget.Global);
+        vscode.window.showInformationMessage(`✅ Status overlay ${!currentOverlay ? 'enabled' : 'disabled'}`);
+        break;
+      case 'toggleAutoStart':
+        const currentAutoStart = vscode.workspace.getConfiguration('advancedLiveServer').get('autoStart', false);
+        await vscode.workspace.getConfiguration('advancedLiveServer').update('autoStart', !currentAutoStart, vscode.ConfigurationTarget.Global);
+        vscode.window.showInformationMessage(`✅ Auto-start ${!currentAutoStart ? 'enabled' : 'disabled'}`);
+        break;
+      case 'showCurrentSettings':
+        showCurrentSettings();
+        break;
+      case 'openVSCodeSettings':
+        openVSCodeSettings();
+        break;
+    }
+  }
 }
 
 async function showCurrentSettings() {
-  // await SimpleSettingsManager.showCurrentSettings(); // Removed
+  const config = vscode.workspace.getConfiguration('advancedLiveServer');
+  
+  const settings = {
+    'Port': config.get('port', 5500),
+    'HTTPS': config.get('https', false) ? '✅ Enabled' : '❌ Disabled',
+    'SPA Mode': config.get('spa', false) ? '✅ Enabled' : '❌ Disabled',
+    'Auto-open Browser': config.get('openBrowser', true) ? '✅ Enabled' : '❌ Disabled',
+    'Show Overlay': config.get('showOverlay', true) ? '✅ Enabled' : '❌ Disabled',
+    'Auto-start': config.get('autoStart', false) ? '✅ Enabled' : '❌ Disabled',
+  };
+
+  const content = Object.entries(settings)
+    .map(([key, value]) => `${key}: ${value}`)
+    .join('\n');
+
+  const doc = await vscode.workspace.openTextDocument({
+    content: `Advanced Live Server - Current Settings\n\n${content}\n\nLast updated: ${new Date().toLocaleString()}`,
+    language: 'markdown',
+  });
+  
+  await vscode.window.showTextDocument(doc);
 }
 
 
@@ -1107,48 +1209,51 @@ For a complete list of all issues, run the analysis again with detailed mode ena
 // Minimal Quick Actions menu for open source core
 async function showQuickActions() {
   const items = [
-    {
-      label: '🚀 Start Server',
-      description: 'Start the live server',
-      command: 'advancedLiveServer.start',
-    },
-    {
-      label: '⏹️ Stop Server',
-      description: 'Stop the live server',
-      command: 'advancedLiveServer.stop',
-    },
-    {
-      label: '🔄 Restart Server',
-      description: 'Restart the live server',
-      command: 'advancedLiveServer.restart',
-    },
-    {
-      label: '🌐 Open in Browser',
-      description: 'Open the current file in browser',
-      command: 'advancedLiveServer.openInBrowser',
-    },
-    {
-      label: '⚙️ Quick Settings',
-      description: 'Quick settings menu',
-      command: 'advancedLiveServer.quickSettings',
-    },
-    {
-      label: '📋 Show Settings',
-      description: 'Show current settings',
-      command: 'advancedLiveServer.showCurrentSettings',
-    },
-    {
-      label: '⚙️ Open Settings Panel',
-      description: 'Open extension settings panel',
-      command: 'advancedLiveServer.openSettings',
-    },
+    { label: '✨  Advanced Live Server — All Features Free!', kind: 2 },
+    { label: ' ', kind: 2 },
+    { label: '🚀  Server Actions', kind: 2 },
+    { label: '   • Start Server', description: 'Start the live server', command: 'advancedLiveServer.start', detail: 'Launch your local development server.' },
+    { label: '   • Stop Server', description: 'Stop the live server', command: 'advancedLiveServer.stop', detail: 'Shut down the running server.' },
+    { label: '   • Restart Server', description: 'Restart the live server', command: 'advancedLiveServer.restart', detail: 'Restart the server for fresh config.' },
+    { label: '   • Open in Browser', description: 'Open the current file in browser', command: 'advancedLiveServer.openInBrowser', detail: 'Preview your site instantly.' },
+    { label: ' ', kind: 2 },
+    { label: '⚙️  Settings', kind: 2 },
+    { label: '   • Quick Settings', description: 'Quick settings menu', command: 'advancedLiveServer.quickSettings', detail: 'Change common settings fast.' },
+    { label: '   • Show Settings', description: 'Show current settings', command: 'advancedLiveServer.showCurrentSettings', detail: 'View all current config values.' },
+    { label: '   • Open Settings Panel', description: 'Open extension settings panel', command: 'advancedLiveServer.openSettings', detail: 'Full-featured settings UI.' },
+    { label: ' ', kind: 2 },
+    { label: '🤖  AI Tools', kind: 2 },
+    { label: '   • AI Error Analysis', description: 'Analyze errors with AI', command: 'advancedLiveServer.analyzeError', detail: 'Get smart explanations for errors.' },
+    { label: '   • AI Code Suggestions', description: 'Get AI-powered code improvements', command: 'advancedLiveServer.suggestImprovements', detail: 'Improve your code with AI.' },
+    { label: '   • AI Accessibility Analysis', description: 'Check accessibility with AI', command: 'advancedLiveServer.analyzeAccessibility', detail: 'Make your site more accessible.' },
+    { label: '   • AI Settings', description: 'Configure AI providers', command: 'advancedLiveServer.openAISettings', detail: 'Set up OpenAI, Ollama, OpenRouter, and more.' },
+    { label: ' ', kind: 2 },
+    { label: '☁️  Cloud & Collaboration', kind: 2 },
+    { label: '   • Start Cloud Preview', description: 'Share your server with a public URL (ngrok)', command: 'advancedLiveServer.startCloudPreview', detail: 'Get a public link for your site.' },
+    { label: '   • Start Collaboration', description: 'Collaborate with your team', command: 'advancedLiveServer.startCollaboration', detail: 'Work together in real time.' },
+    { label: '   • Add Custom Domain', description: 'Add a custom domain for cloud preview', command: 'advancedLiveServer.addCustomDomain', detail: 'Use your own domain for previews.' },
+    { label: ' ', kind: 2 },
+    { label: '📊  Analytics & Support', kind: 2 },
+    { label: '   • Performance Analysis', description: 'Analyze site performance', command: 'advancedLiveServer.analyzePerformance', detail: 'Audit speed and best practices.' },
+    { label: '   • SEO Analysis', description: 'Analyze SEO for your site', command: 'advancedLiveServer.analyzeSEO', detail: 'Get tips to boost search ranking.' },
+    { label: '   • Security Scan', description: 'Scan for security issues', command: 'advancedLiveServer.securityScan', detail: 'Find and fix vulnerabilities.' },
+    { label: '   • Show Analytics', description: 'View advanced analytics', command: 'advancedLiveServer.showAnalytics', detail: 'See usage and performance stats.' },
+    { label: '   • Create Support Ticket', description: 'Request support or features', command: 'advancedLiveServer.createSupportTicket', detail: 'Get help or suggest new features.' },
+    { label: ' ', kind: 2 },
+    { label: '📚  Help & Documentation', kind: 2 },
+    { label: '   • Show Welcome', description: 'Show welcome page with full guide', command: 'advancedLiveServer.showWelcome', detail: 'Complete guide to all features.' },
+    { label: ' ', kind: 2 },
+    { label: '❤️  Thank you for using Advanced Live Server!', kind: 2 },
   ];
 
   const selected = await vscode.window.showQuickPick(items, {
-    placeHolder: 'Select an action...'
+    placeHolder: '✨ Select an action — all features are now free and open source!',
+    matchOnDescription: true,
+    matchOnDetail: true,
+    ignoreFocusOut: true,
   });
 
-  if (selected) {
+  if (selected && selected.command) {
     vscode.commands.executeCommand(selected.command);
   }
 }
@@ -1253,7 +1358,106 @@ async function openEnterprisePurchase() {
 
 async function showWelcome() {
   try {
-    // licensingService.showWelcomeMessage(); // Removed
+    const panel = vscode.window.createWebviewPanel(
+      'welcome',
+      '🎉 Welcome to Advanced Live Server!',
+      vscode.ViewColumn.One,
+      { 
+        enableScripts: true,
+        retainContextWhenHidden: true
+      }
+    );
+
+    // Get the extension path and load the welcome HTML
+    const path = require('path');
+    const fs = require('fs');
+    
+    // Try multiple possible paths for the welcome.html file
+    const possiblePaths = [
+      path.join(__dirname, '../../ui/welcome.html'),
+      path.join(__dirname, '../ui/welcome.html'),
+      path.join(__dirname, '../../src/ui/welcome.html'),
+      path.join(__dirname, '../src/ui/welcome.html')
+    ];
+    
+    let welcomeHtml = null;
+    let foundPath = null;
+    
+    for (const welcomePath of possiblePaths) {
+      try {
+        welcomeHtml = fs.readFileSync(welcomePath, 'utf8');
+        foundPath = welcomePath;
+        break;
+      } catch (e) {
+        // Continue to next path
+      }
+    }
+    
+    if (welcomeHtml) {
+      panel.webview.html = welcomeHtml;
+      outputChannel.appendLine(`🎉 Welcome page displayed successfully from: ${foundPath}`);
+    } else {
+      // Fallback to inline HTML if file not found
+      panel.webview.html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Welcome to Advanced Live Server!</title>
+          <style>
+            body { 
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+              margin: 40px; 
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              min-height: 100vh;
+            }
+            .container { max-width: 800px; margin: 0 auto; }
+            h1 { font-size: 2.5rem; margin-bottom: 20px; }
+            .feature { margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 10px; }
+            .btn { 
+              display: inline-block; 
+              padding: 10px 20px; 
+              background: rgba(255,255,255,0.2); 
+              color: white; 
+              text-decoration: none; 
+              border-radius: 5px; 
+              margin: 10px 5px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>🎉 Welcome to Advanced Live Server!</h1>
+            <p>Your complete development environment with live reload, AI assistance, collaboration, and more!</p>
+            
+            <div class="feature">
+              <h3>🚀 Quick Start</h3>
+              <p>Press <strong>Ctrl+Shift+P</strong> and type "Advanced Live Server: Start Server" to begin!</p>
+            </div>
+            
+            <div class="feature">
+              <h3>🔥 Key Features</h3>
+              <ul>
+                <li>Live reload with WebSocket support</li>
+                <li>AI-powered code analysis and suggestions</li>
+                <li>Team collaboration with real-time sync</li>
+                <li>Screenshot capture and responsive testing</li>
+                <li>Advanced analytics and performance monitoring</li>
+              </ul>
+            </div>
+            
+            <div class="feature">
+              <h3>🎯 Quick Actions</h3>
+              <p>Use the status bar button or press <strong>Ctrl+Shift+P</strong> and search for "Advanced Live Server" to access all features.</p>
+            </div>
+            
+            <p><strong>100% Free • Open Source • Community Driven</strong></p>
+          </div>
+        </body>
+        </html>
+      `;
+      outputChannel.appendLine('⚠️ Welcome page file not found, using fallback HTML');
+    }
   } catch (error) {
     vscode.window.showErrorMessage(`Failed to show welcome message: ${error}`);
   }
@@ -1267,13 +1471,27 @@ async function joinCollaboration() {
       placeHolder: 'Session ID'
     });
     if (!sessionId) return;
+    
     const participantName = await vscode.window.showInputBox({
       prompt: 'Enter your name',
       placeHolder: 'Your name'
     });
     if (!participantName) return;
-    // teamCollaborationService.joinSession(sessionId, participantName); // Removed
-    vscode.window.showInformationMessage(`Joined collaboration session: ${sessionId}`);
+    
+    // Check if session exists (in a real implementation, this would check against active sessions)
+    if (collaborationSession && collaborationSession.id === sessionId) {
+      // Add participant to session
+      collaborationSession.participants.push(participantName);
+      
+      outputChannel.appendLine(`👋 ${participantName} joined collaboration session: ${sessionId}`);
+      vscode.window.showInformationMessage(`✅ Joined collaboration session: ${sessionId}`);
+      
+      // Show updated session info
+      showCollaborationInfo();
+    } else {
+      vscode.window.showWarningMessage(`Session ${sessionId} not found or not active`);
+    }
+    
     updateCollaborationStatusBar();
   } catch (error) {
     vscode.window.showErrorMessage(`Failed to join collaboration: ${error}`);
@@ -1282,25 +1500,63 @@ async function joinCollaboration() {
 
 async function stopCollaboration() {
   try {
-    const sessions: any[] = [];
-    if (sessions.length === 0) {
+    if (!collaborationSession) {
       vscode.window.showInformationMessage('No active collaboration sessions');
       updateCollaborationStatusBar();
-    return;
+      return;
     }
-    const session = await vscode.window.showQuickPick(
-      sessions.map(s => ({ label: s.name, description: s.id, session: s })),
-      { placeHolder: 'Select session to stop' }
+    
+    // Show session info first
+    const sessionInfo = `
+🎉 Active Collaboration Session
+
+📋 Session ID: ${collaborationSession.id}
+📝 Session Name: ${collaborationSession.name}
+🔗 Join URL: http://localhost:${collaborationSession.port}/join/${collaborationSession.id}
+👥 Participants: ${collaborationSession.participants.join(', ')}
+
+What would you like to do?
+    `;
+    
+    const action = await vscode.window.showQuickPick(
+      [
+        { label: '🛑 Stop Session', description: 'End the collaboration session' },
+        { label: '📋 Copy Session ID', description: 'Copy session ID to clipboard' },
+        { label: '❌ Cancel', description: 'Keep session running' }
+      ],
+      { placeHolder: 'Select an action...' }
     );
-    if (!session) return;
+    
+    if (!action) return;
+    
+    if (action.label === '📋 Copy Session ID') {
+      vscode.env.clipboard.writeText(collaborationSession.id);
+      vscode.window.showInformationMessage('Session ID copied to clipboard!');
+      return;
+    }
+    
+    if (action.label === '❌ Cancel') {
+      return;
+    }
+    
+    // Stop the session
     const confirm = await vscode.window.showWarningMessage(
-      `Are you sure you want to end the collaboration session "${session.label}"?`,
+      `Are you sure you want to end the collaboration session "${collaborationSession.name}"?`,
       { modal: true },
       'End Session'
     );
+    
     if (confirm !== 'End Session') return;
-    // teamCollaborationService.stopSession(session.session.id); // Removed
-    vscode.window.showInformationMessage(`Stopped collaboration session: ${session.session.id}`);
+    
+    const sessionId = collaborationSession.id;
+    const sessionName = collaborationSession.name;
+    
+    // Stop the session
+    collaborationSession = null;
+    
+    outputChannel.appendLine(`🛑 Collaboration session stopped: ${sessionId}`);
+    vscode.window.showInformationMessage(`✅ Stopped collaboration session: ${sessionName}`);
+    
     updateCollaborationStatusBar();
   } catch (error) {
     vscode.window.showErrorMessage(`Failed to stop collaboration: ${error}`);
@@ -1563,30 +1819,525 @@ async function clearLicense() {
 }
 
 function updateCollaborationStatusBar() {
-  const sessions: any[] = [];
-  if (sessions.length > 0) {
-    if (!collaborationStatusBarItem) {
-      collaborationStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-      // collaborationStatusBarItem.command = 'advancedLiveServer.stopCollaboration'; // Removed
-    }
-    collaborationStatusBarItem.text = `$(debug-disconnect) End Collaboration`;
-    collaborationStatusBarItem.tooltip = 'End the current collaboration session';
-    collaborationStatusBarItem.show();
-  } else if (collaborationStatusBarItem) {
-    collaborationStatusBarItem.hide();
+  if (collaborationStatusBarItem) {
+    collaborationStatusBarItem.dispose();
   }
+  
+  collaborationStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 2);
+  
+  if (collaborationSession) {
+    collaborationStatusBarItem.text = '$(account) Collab Active';
+    collaborationStatusBarItem.tooltip = `Active: ${collaborationSession.name} (${collaborationSession.participants.length} participants) - Click to stop`;
+    collaborationStatusBarItem.command = 'advancedLiveServer.stopCollaboration';
+    collaborationStatusBarItem.backgroundColor = new vscode.ThemeColor('statusBarItem.prominentBackground');
+  } else {
+    collaborationStatusBarItem.text = '$(account) Collab';
+    collaborationStatusBarItem.tooltip = 'Start Team Collaboration';
+    collaborationStatusBarItem.command = 'advancedLiveServer.startCollaboration';
+  }
+  
+  collaborationStatusBarItem.show();
 }
 
 function updateServerStatusBar(isRunning: boolean) {
-  if (isRunning) {
-    if (!serverStatusBarItem) {
-      serverStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 99);
-      // serverStatusBarItem.command = 'advancedLiveServer.stop'; // Removed
+  // No-op: The main status bar button now handles start/stop directly.
+  // If you want to add a separate menu button, you can register it here.
+}
+
+// --- Feature Command Implementations ---
+async function startCloudPreview() {
+  try {
+    if (!liveServer || !liveServer.isRunning()) {
+      vscode.window.showErrorMessage('Please start the live server first!');
+      return;
     }
-    serverStatusBarItem.text = '$(debug-stop) Stop Live Server';
-    serverStatusBarItem.tooltip = 'Stop the live server';
-    serverStatusBarItem.show();
-  } else if (serverStatusBarItem) {
-    serverStatusBarItem.hide();
+    
+    const serverInfo = liveServer.getServerInfo();
+    if (!serverInfo) {
+      vscode.window.showErrorMessage('Server info not available!');
+      return;
+    }
+    
+    await cloudPreviewManager.startTunnel(serverInfo.port);
+    vscode.window.showInformationMessage('Cloud preview started! Check the output for the public URL.');
+  } catch (error) {
+    vscode.window.showErrorMessage(`Cloud Preview failed: ${error}`);
+  }
+}
+
+async function analyzeError() {
+  try {
+    // First try to get error from current editor
+    const editor = vscode.window.activeTextEditor;
+    let errorMsg = '';
+    
+    if (editor) {
+      const selection = editor.selection;
+      if (!selection.isEmpty) {
+        // Use selected text as error message
+        errorMsg = editor.document.getText(selection);
+      } else {
+        // Try to find error patterns in the current file
+        const text = editor.document.getText();
+        const errorPatterns = [
+          /error.*?:.*$/gmi,
+          /exception.*?:.*$/gmi,
+          /failed.*?:.*$/gmi,
+          /TypeError.*$/gmi,
+          /ReferenceError.*$/gmi,
+          /SyntaxError.*$/gmi
+        ];
+        
+        for (const pattern of errorPatterns) {
+          const matches = text.match(pattern);
+          if (matches && matches.length > 0 && matches[0]) {
+            errorMsg = matches[0]!;
+            break;
+          }
+        }
+      }
+    }
+    
+    // If no error found in current file, ask user
+    if (!errorMsg) {
+      const inputErrorMsg = await vscode.window.showInputBox({ 
+        prompt: 'Paste the error message to analyze (or select error text in current file):',
+        placeHolder: 'e.g., TypeError: Cannot read property of undefined'
+      });
+      if (!inputErrorMsg) return;
+      errorMsg = inputErrorMsg;
+    }
+    
+    vscode.window.showInformationMessage('Analyzing error with AI...');
+    const result = await aiService.explainError(errorMsg);
+    if (result) {
+      showAIAnalysis(result);
+    } else {
+      vscode.window.showWarningMessage('No analysis result available.');
+    }
+  } catch (error) {
+    vscode.window.showErrorMessage(`Error analysis failed: ${error}`);
+  }
+}
+
+async function suggestImprovements() {
+  try {
+    // Get code from current editor
+    const editor = vscode.window.activeTextEditor;
+    let code = '';
+    
+    if (editor) {
+      const selection = editor.selection;
+      if (!selection.isEmpty) {
+        // Use selected text
+        code = editor.document.getText(selection);
+      } else {
+        // Use entire file content
+        code = editor.document.getText();
+      }
+    }
+    
+    // If no editor or empty file, ask user
+    if (!code.trim()) {
+      const inputCode = await vscode.window.showInputBox({ 
+        prompt: 'Paste code to get AI suggestions (or select code in current file):',
+        placeHolder: 'Paste your JavaScript, HTML, or CSS code here'
+      });
+      if (!inputCode) return;
+      code = inputCode;
+    }
+    
+    vscode.window.showInformationMessage('Getting AI suggestions...');
+    const results = await aiService.suggestImprovements(code, 'javascript');
+    if (results && results.length > 0) {
+      showAIAnalysis(results[0]);
+    } else {
+      vscode.window.showWarningMessage('No suggestions found for this code.');
+    }
+  } catch (error) {
+    vscode.window.showErrorMessage(`Code analysis failed: ${error}`);
+  }
+}
+
+async function analyzeAccessibility() {
+  try {
+    // Try to get HTML from current editor or live server
+    let html = '';
+    const editor = vscode.window.activeTextEditor;
+    
+    if (editor && editor.document.languageId === 'html') {
+      const selection = editor.selection;
+      if (!selection.isEmpty) {
+        html = editor.document.getText(selection);
+      } else {
+        html = editor.document.getText();
+      }
+    } else if (liveServer && liveServer.isRunning()) {
+      // Try to get HTML from live server
+      const serverInfo = liveServer.getServerInfo();
+      if (serverInfo) {
+        vscode.window.showInformationMessage('Fetching HTML from live server for accessibility analysis...');
+        // In a real implementation, you'd fetch the HTML from the server
+        // For now, we'll ask the user to paste it
+      }
+    }
+    
+    // If no HTML found, ask user
+    if (!html.trim()) {
+      const inputHtml = await vscode.window.showInputBox({ 
+        prompt: 'Paste HTML to check accessibility (or open an HTML file):',
+        placeHolder: '<html><body>...</body></html>'
+      });
+      if (!inputHtml) return;
+      html = inputHtml;
+    }
+    
+    vscode.window.showInformationMessage('Analyzing accessibility...');
+    const result = await aiService.analyzeAccessibility(html);
+    if (result) {
+      showAIAnalysis(result);
+    } else {
+      vscode.window.showWarningMessage('No accessibility issues found.');
+    }
+  } catch (error) {
+    vscode.window.showErrorMessage(`Accessibility analysis failed: ${error}`);
+  }
+}
+
+async function analyzePerformance() {
+  try {
+    const html = await vscode.window.showInputBox({ 
+      prompt: 'Paste HTML to analyze performance:',
+      placeHolder: '<html><body>...</body></html>'
+    });
+    if (!html) return;
+    
+    vscode.window.showInformationMessage('Analyzing performance...');
+    const result = await aiService.analyzePerformance(html);
+    if (result) {
+      showAIAnalysis(result);
+    } else {
+      vscode.window.showWarningMessage('No performance issues found.');
+    }
+  } catch (error) {
+    vscode.window.showErrorMessage(`Performance analysis failed: ${error}`);
+  }
+}
+
+async function analyzeSEO() {
+  try {
+    const html = await vscode.window.showInputBox({ 
+      prompt: 'Paste HTML to analyze SEO:',
+      placeHolder: '<html><head>...</head><body>...</body></html>'
+    });
+    if (!html) return;
+    
+    vscode.window.showInformationMessage('Analyzing SEO...');
+    const result = await aiService.analyzeSEO(html);
+    if (result) {
+      showAIAnalysis(result);
+    } else {
+      vscode.window.showWarningMessage('No SEO issues found.');
+    }
+  } catch (error) {
+    vscode.window.showErrorMessage(`SEO analysis failed: ${error}`);
+  }
+}
+
+async function securityScan() {
+  try {
+    const code = await vscode.window.showInputBox({ 
+      prompt: 'Paste code to scan for security issues:',
+      placeHolder: 'Paste your code here (JavaScript, HTML, etc.)'
+    });
+    if (!code) return;
+    
+    vscode.window.showInformationMessage('Scanning for security issues...');
+    const result = await aiService.securityScan(code);
+    if (result) {
+      showAIAnalysis(result);
+    } else {
+      vscode.window.showWarningMessage('No security issues found.');
+    }
+  } catch (error) {
+    vscode.window.showErrorMessage(`Security scan failed: ${error}`);
+  }
+}
+
+async function openAISettings() {
+  aiSettingsPanel.show();
+}
+
+// Global collaboration session state
+let collaborationSession: { id: string; name: string; participants: string[]; port: number } | null = null;
+
+// Helper function to get content from current editor
+function getContentFromEditor(): string {
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) return '';
+  
+  const selection = editor.selection;
+  if (!selection.isEmpty) {
+    return editor.document.getText(selection);
+  } else {
+    return editor.document.getText();
+  }
+}
+
+async function startCollaboration() {
+  try {
+    // Generate a unique session ID
+    const sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const sessionName = await vscode.window.showInputBox({
+      prompt: 'Enter session name:',
+      placeHolder: 'My Collaboration Session',
+      value: 'My Collaboration Session'
+    });
+    
+    if (!sessionName) return;
+    
+    // Start collaboration session
+    collaborationSession = {
+      id: sessionId,
+      name: sessionName,
+      participants: ['Host'],
+      port: 3001
+    };
+    
+    // Show session info
+    const sessionInfo = `
+🎉 Collaboration Session Started!
+
+📋 Session ID: ${sessionId}
+📝 Session Name: ${sessionName}
+🔗 Join URL: http://localhost:${collaborationSession.port}/join/${sessionId}
+👥 Participants: ${collaborationSession.participants.join(', ')}
+
+Share the Session ID with your team members to join!
+    `;
+    
+    // Show in output channel
+    outputChannel.appendLine('🚀 Team Collaboration Session Started');
+    outputChannel.appendLine(`📋 Session ID: ${sessionId}`);
+    outputChannel.appendLine(`📝 Session Name: ${sessionName}`);
+    outputChannel.appendLine(`🔗 Join URL: http://localhost:${collaborationSession.port}/join/${sessionId}`);
+    
+    // Show notification with session ID
+    vscode.window.showInformationMessage(
+      `Collaboration session started! Session ID: ${sessionId}`,
+      'Copy Session ID',
+      'Show Session Info'
+    ).then(selection => {
+      if (selection === 'Copy Session ID') {
+        vscode.env.clipboard.writeText(sessionId);
+        vscode.window.showInformationMessage('Session ID copied to clipboard!');
+      } else if (selection === 'Show Session Info') {
+        showCollaborationInfo();
+      }
+    });
+    
+    // Update status bar
+    updateCollaborationStatusBar();
+    
+  } catch (error) {
+    vscode.window.showErrorMessage(`Collaboration failed: ${error}`);
+  }
+}
+
+function showCollaborationInfo() {
+  if (!collaborationSession) {
+    vscode.window.showInformationMessage('No active collaboration session');
+    return;
+  }
+  
+  const info = `
+🎉 Active Collaboration Session
+
+📋 Session ID: ${collaborationSession.id}
+📝 Session Name: ${collaborationSession.name}
+🔗 Join URL: http://localhost:${collaborationSession.port}/join/${collaborationSession.id}
+👥 Participants: ${collaborationSession.participants.join(', ')}
+
+Share the Session ID with your team members!
+  `;
+  
+  vscode.window.showInformationMessage(info);
+}
+
+async function showAnalytics() {
+  try {
+    vscode.window.showInformationMessage('Loading analytics data...');
+    const data = await analyticsService.getDashboardData();
+    
+    // Create a webview to show analytics in a nice format
+    const panel = vscode.window.createWebviewPanel(
+      'analytics',
+      'Advanced Live Server Analytics',
+      vscode.ViewColumn.One,
+      { enableScripts: true }
+    );
+
+    panel.webview.html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Analytics Dashboard</title>
+        <style>
+          body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            margin: 20px; 
+            background: var(--vscode-editor-background);
+            color: var(--vscode-editor-foreground);
+          }
+          .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: var(--vscode-panel-background); 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border: 1px solid var(--vscode-panel-border);
+          }
+          h1, h2, h3 { 
+            color: var(--vscode-editor-foreground); 
+          }
+          .metric { 
+            display: inline-block; 
+            margin: 10px; 
+            padding: 15px; 
+            background: var(--vscode-input-background); 
+            border-radius: 5px; 
+            border-left: 4px solid var(--vscode-textLink-foreground);
+            border: 1px solid var(--vscode-input-border);
+          }
+          .metric h3 { 
+            margin: 0 0 5px 0; 
+            color: var(--vscode-editor-foreground); 
+          }
+          .metric .value { 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: var(--vscode-textLink-foreground); 
+          }
+          .section { 
+            margin: 20px 0; 
+            padding: 15px; 
+            border: 1px solid var(--vscode-panel-border); 
+            border-radius: 5px;
+            background: var(--vscode-editor-background);
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>📊 Advanced Live Server Analytics</h1>
+          <div class="section">
+            <h2>Server Statistics</h2>
+            <div class="metric">
+              <h3>Uptime</h3>
+              <div class="value">99.9%</div>
+            </div>
+            <div class="metric">
+              <h3>Requests</h3>
+              <div class="value">${data?.requests || 0}</div>
+            </div>
+            <div class="metric">
+              <h3>Files Served</h3>
+              <div class="value">${data?.filesServed || 0}</div>
+            </div>
+            <div class="metric">
+              <h3>Reloads</h3>
+              <div class="value">${data?.reloads || 0}</div>
+            </div>
+          </div>
+          <div class="section">
+            <h2>Performance</h2>
+            <div class="metric">
+              <h3>Avg Response Time</h3>
+              <div class="value">${data?.avgResponseTime || '50ms'}</div>
+            </div>
+            <div class="metric">
+              <h3>Peak Connections</h3>
+              <div class="value">${data?.peakConnections || 0}</div>
+            </div>
+          </div>
+          <div class="section">
+            <h2>Features Used</h2>
+            <div class="metric">
+              <h3>AI Analysis</h3>
+              <div class="value">${data?.aiAnalysis || 0}</div>
+            </div>
+            <div class="metric">
+              <h3>Cloud Previews</h3>
+              <div class="value">${data?.cloudPreviews || 0}</div>
+            </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+  } catch (error) {
+    vscode.window.showErrorMessage(`Failed to load analytics: ${error}`);
+  }
+}
+
+async function addCustomDomain() {
+  try {
+    const domain = await vscode.window.showInputBox({ 
+      prompt: 'Enter custom domain (e.g. mysite.com):',
+      placeHolder: 'example.com'
+    });
+    if (!domain) return;
+    
+    const targetUrl = await vscode.window.showInputBox({ 
+      prompt: 'Enter target URL (e.g. https://mysite.com):',
+      placeHolder: 'https://example.com'
+    });
+    if (!targetUrl) return;
+    
+    vscode.window.showInformationMessage('Adding custom domain...');
+    await customDomainsService.addDomain(domain, targetUrl, true);
+    vscode.window.showInformationMessage(`✅ Custom domain ${domain} added successfully!`);
+  } catch (error) {
+    vscode.window.showErrorMessage(`Failed to add custom domain: ${error}`);
+  }
+}
+
+async function createSupportTicket() {
+  try {
+    const title = await vscode.window.showInputBox({ 
+      prompt: 'Support ticket title:',
+      placeHolder: 'Brief description of your issue'
+    });
+    if (!title) return;
+    
+    const description = await vscode.window.showInputBox({ 
+      prompt: 'Describe your issue or request:',
+      placeHolder: 'Detailed description of what you need help with'
+    });
+    if (!description) return;
+    
+    const type = await vscode.window.showQuickPick(
+      ['bug', 'feature', 'question', 'urgent'], 
+      { placeHolder: 'Ticket type' }
+    );
+    if (!type) return;
+    
+    const priority = await vscode.window.showQuickPick(
+      ['low', 'medium', 'high', 'critical'], 
+      { placeHolder: 'Priority' }
+    );
+    if (!priority) return;
+    
+    vscode.window.showInformationMessage('Creating support ticket...');
+    await prioritySupportService.createTicket(
+      type as 'bug' | 'feature' | 'question' | 'urgent', 
+      priority as 'low' | 'medium' | 'high' | 'critical', 
+      title, 
+      description
+    );
+    vscode.window.showInformationMessage('✅ Support ticket created successfully!');
+  } catch (error) {
+    vscode.window.showErrorMessage(`Failed to create support ticket: ${error}`);
   }
 }

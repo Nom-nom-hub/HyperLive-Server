@@ -19,16 +19,16 @@ export class StatusBarManager {
     this.isRunning = running;
 
     if (running && port) {
-      this.statusBarItem.text = `$(rocket) Live Server (${port})`;
-      this.statusBarItem.command = 'advancedLiveServer.showQuickActions';
-      this.statusBarItem.tooltip = `Advanced Live Server running on port ${port}. Click for menu.`;
+      this.statusBarItem.text = `$(debug-stop) Stop Live Server (${port})`;
+      this.statusBarItem.command = 'advancedLiveServer.stop';
+      this.statusBarItem.tooltip = `Click to stop the server on port ${port}`;
       this.statusBarItem.backgroundColor = new vscode.ThemeColor(
         'statusBarItem.prominentBackground'
       );
     } else {
-      this.statusBarItem.text = '$(rocket) Live Server';
-      this.statusBarItem.command = 'advancedLiveServer.showQuickActions';
-      this.statusBarItem.tooltip = 'Advanced Live Server: Click for menu';
+      this.statusBarItem.text = '$(rocket) Start Live Server';
+      this.statusBarItem.command = 'advancedLiveServer.start';
+      this.statusBarItem.tooltip = 'Click to start the live server';
       this.statusBarItem.backgroundColor = undefined;
     }
 

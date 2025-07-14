@@ -4,11 +4,6 @@ export function injectReloadScript(
 ): string {
   const reloadScript = generateReloadScript(showOverlay);
 
-  // Check if the script is already injected
-  if (htmlContent.includes('advanced-live-server-reload')) {
-    return htmlContent;
-  }
-
   // Inject the script before the closing </head> tag
   if (htmlContent.includes('</head>')) {
     return htmlContent.replace('</head>', `${reloadScript}\n</head>`);
@@ -42,6 +37,7 @@ function generateReloadScript(showOverlay: boolean): string {
                 let reconnectAttempts = 0;
                 const maxReconnectAttempts = 5;
                 const reconnectDelay = 1000;
+                let pingInterval = null;
                 
                 // Expose WebSocket status globally for the test app
                 window.liveServerWebSocket = null;
@@ -114,6 +110,13 @@ function generateReloadScript(showOverlay: boolean): string {
                             window.liveServerWebSocket = ws;
                             window.liveServerStatus = 'connected';
                             showNotification('Connected to Live Server', 'success', 2000);
+                            
+                            // Start ping interval to keep connection alive
+                            pingInterval = setInterval(function() {
+                                if (ws && ws.readyState === WebSocket.OPEN) {
+                                    ws.send(JSON.stringify({ type: 'ping', timestamp: Date.now() }));
+                                }
+                            }, 30000); // Send ping every 30 seconds
                         };
                         
                         // --- Live Collaboration Client ---
@@ -169,33 +172,21 @@ function generateReloadScript(showOverlay: boolean): string {
                             }
                         }
 
-                        // Patch ws.onmessage to handle collab
-                        const origOnMessage = ws.onmessage;
                         ws.onmessage = function(event) {
                             try {
                                 const data = JSON.parse(event.data);
+                                
+                                // Handle collaboration messages
                                 handleCollabMessage(data);
-                                if (data.type === 'reload') {
-                                    console.log('📝 File changed: ' + data.file);
-                                    showNotification('Reloading... (' + data.file + ')', 'info', 2000);
-                                    setTimeout(function() { window.location.reload(); }, 100);
-                                }
-                            } catch (error) {
-                                if (origOnMessage) origOnMessage.call(ws, event);
-                            }
-                        };
-                        
-                        ws.onmessage = function(event) {
-                            try {
-                                const data = JSON.parse(event.data);
                                 
                                 if (data.type === 'reload') {
                                     console.log('📝 File changed: ' + data.file);
                                     showNotification('Reloading... (' + data.file + ')', 'info', 2000);
                                     
-                                    // Small delay to show the notification
+                                    // Force immediate reload without URL parameters
                                     setTimeout(function() {
-                                        window.location.reload();
+                                        console.log('🔄 Executing reload...');
+                                        window.location.reload(true);
                                     }, 100);
                                 }
                             } catch (error) {
@@ -203,10 +194,21 @@ function generateReloadScript(showOverlay: boolean): string {
                             }
                         };
                         
-                        ws.onclose = function() {
-                            console.log('🔌 Disconnected from Advanced Live Server');
+                        ws.onclose = function(event) {
+                            console.log('🔌 Disconnected from Advanced Live Server', event.code, event.reason);
                             window.liveServerWebSocket = null;
                             window.liveServerStatus = 'disconnected';
+                            
+                            // Clear ping interval
+                            if (pingInterval) {
+                                clearInterval(pingInterval);
+                                pingInterval = null;
+                            }
+                            
+                            // Don't reconnect if we're about to reload or if it's a normal close
+                            if (window.location.href.includes('reload=true') || window.location.href.includes('_t=')) {
+                                return;
+                            }
                             
                             if (reconnectAttempts < maxReconnectAttempts) {
                                 reconnectAttempts++;
@@ -227,6 +229,7 @@ function generateReloadScript(showOverlay: boolean): string {
                         
                     } catch (error) {
                         console.error('Failed to connect to WebSocket:', error);
+                        showNotification('Failed to connect to Live Server', 'error', 3000);
                     }
                 }
                 
@@ -248,6 +251,24 @@ function generateReloadScript(showOverlay: boolean): string {
                 window.addEventListener('error', function(event) {
                     showNotification('JavaScript Error: ' + event.message, 'error', 5000);
                 });
+                
+                // Add a manual reload function for debugging
+                window.forceReload = function() {
+                    console.log('🔄 Manual reload triggered');
+                    window.location.reload(true);
+                };
+                
+                // Add a test function to check WebSocket status
+                window.checkWebSocketStatus = function() {
+                    console.log('WebSocket status:', window.liveServerStatus);
+                    console.log('WebSocket object:', window.liveServerWebSocket);
+                    console.log('WebSocket readyState:', ws ? ws.readyState : 'No WebSocket');
+                    return {
+                        status: window.liveServerStatus,
+                        readyState: ws ? ws.readyState : null,
+                        hasWebSocket: !!window.liveServerWebSocket
+                    };
+                };
                 
                 // Console log interceptor disabled - was too intrusive
                 // Uncomment the lines below if you want to see console errors as notifications
