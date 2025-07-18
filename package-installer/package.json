@@ -33,5 +33,10 @@
   "bugs": {
     "url": "https://github.com/Nom-nom-hub/HyperLive-Server/issues"
   },
-  "homepage": "https://github.com/Nom-nom-hub/HyperLive-Server#readme"
+  "homepage": "https://github.com/Nom-nom-hub/HyperLive-Server#readme",
+  "files": [
+    "bin/",
+    "extension/",
+    "index.js"
+  ]
 } 
