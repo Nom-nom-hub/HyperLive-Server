@@ -4,22 +4,25 @@ const fs = require('fs-extra');
 const path = require('path');
 const os = require('os');
 
-console.log('🚀 Installing Advanced Live Server VS Code Extension...');
+console.log('🚀 Installing Advanced Live Server Extension for VS Code / Cursor...');
 
 async function installExtension() {
   try {
-    // Get VS Code extensions directory
-    const vscodeExtensionsDir = getVSCodeExtensionsDir();
-    if (!vscodeExtensionsDir) {
-      console.error('❌ Could not find VS Code extensions directory');
-      console.log('Please install VS Code first: https://code.visualstudio.com/');
-      process.exit(1);
+    // Get possible extension directories for VS Code and Cursor
+    const extensionDirs = getEditorExtensionsDirs();
+    const foundDir = extensionDirs.find(dir => fs.existsSync(dir));
+    if (!foundDir) {
+      console.warn('⚠️  Could not find a supported editor extensions directory (VS Code, Cursor, etc).');
+      console.warn('   Supported editors: VS Code, Cursor.');
+      console.warn('   If you are using a compatible editor, please ensure it is installed.');
+      console.warn('   Skipping extension installation.');
+      return;
     }
 
     // Source extension directory - use the extension files included in this package
     const sourceDir = path.join(__dirname, '../extension');
     const extensionName = 'advanced-live-server';
-    const targetDir = path.join(vscodeExtensionsDir, extensionName);
+    const targetDir = path.join(foundDir, extensionName);
 
     // Check if extension already exists
     if (await fs.pathExists(targetDir)) {
@@ -139,11 +142,11 @@ async function installExtension() {
     console.log('✅ Extension installed successfully!');
     console.log('');
     console.log('🎉 Next steps:');
-    console.log('1. Restart VS Code');
+    console.log('1. Restart VS Code or Cursor');
     console.log('2. Open any HTML file or project folder');
     console.log('3. Press Ctrl+Shift+P and type "Advanced Live Server: Start Server"');
     console.log('');
-    console.log('📚 For help, run "Advanced Live Server: Show Welcome" in VS Code');
+    console.log('📚 For help, run "Advanced Live Server: Show Welcome" in your editor');
 
   } catch (error) {
     console.error('❌ Installation failed:', error.message);
@@ -151,20 +154,18 @@ async function installExtension() {
   }
 }
 
-function getVSCodeExtensionsDir() {
+function getEditorExtensionsDirs() {
   const platform = os.platform();
   const homeDir = os.homedir();
-
-  switch (platform) {
-    case 'win32':
-      return path.join(homeDir, '.vscode', 'extensions');
-    case 'darwin':
-      return path.join(homeDir, '.vscode', 'extensions');
-    case 'linux':
-      return path.join(homeDir, '.vscode', 'extensions');
-    default:
-      return null;
-  }
+  // Common extension directories for VS Code, Cursor, and open source builds
+  const dirs = [
+    path.join(homeDir, '.vscode', 'extensions'),
+    path.join(homeDir, '.vscode-oss', 'extensions'),
+    path.join(homeDir, '.cursor', 'extensions'),
+    path.join(homeDir, '.vscodium', 'extensions'),
+    path.join(homeDir, '.windsurf', 'extensions'), // Windsurf support
+  ];
+  return dirs;
 }
 
 // Run installer

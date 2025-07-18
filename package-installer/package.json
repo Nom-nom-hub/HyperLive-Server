@@ -1,6 +1,6 @@
 {
   "name": "advanced-live-server-installer",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Auto-installer for Advanced Live Server VS Code Extension",
   "main": "index.js",
   "bin": {
