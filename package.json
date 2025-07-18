@@ -2,7 +2,7 @@
   "name": "advanced-live-server",
   "displayName": "Advanced Live Server",
   "description": "A modern, open source live server for VSCode. Free core features, with Pro/Enterprise upgrade for AI, cloud, and team tools.",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "publisher": "teck",
   "license": "MIT",
   "engines": {
